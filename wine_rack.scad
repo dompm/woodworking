@@ -85,6 +85,19 @@ FERRULE_OS  = 0.02;   // brass proud of the wood
 //           reads as four lumps under the case.
 LEG_MOUNT   = "plate";
 
+// ---------------- leg style ----------------
+//  "round"   turned, splayed, brass ferrules -- the mid-century look. Bought.
+//  "square"  square section tapered on its two INNER faces, no splay, held by
+//            glue blocks instead of hardware -- the scandinavian look, and you
+//            can make these yourself with a table saw and a hand plane.
+LEG_STYLE = "round";
+
+SQ_TOP   = 1.50;    // square leg, across the flats at the top
+SQ_BOT   = 0.875;   // at the foot
+SQ_INSET = 0.125;   // reveal between the leg's outer faces and the case sides
+GB_XY    = 1.00;    // glue blocks in the inner corner
+GB_H     = 1.25;
+
 PLATE_XY    = 2.375;  // steel plate footprint
 PLATE_T     = 0.125;  // plate thickness
 PLATE_BOSS  = 0.20;   // mean thickness of the angled seat on top of the plate
@@ -98,14 +111,19 @@ MOUNT_INSET = 0.375;  // set in from the carcass edges so it sits in shadow
 W = COLS*OPENING + (COLS+1)*T;          // 10.25
 H = ROWS*OPENING + (ROWS+1)*T;          // 29.25
 
-PLATED   = (LEG_MOUNT == "plate");
+SQUARE   = (LEG_STYLE == "square");
+PLATED   = (LEG_MOUNT == "plate") && !SQUARE;
 MOUNT_XY = PLATED ? PLATE_XY : BLOCK_XY;
-MOUNT_H  = PLATED ? PLATE_T + PLATE_BOSS : BLOCK_H;  // underside of case -> shoulder
+// a square leg butts straight up against the underside; nothing in between
+MOUNT_H  = SQUARE ? 0 : (PLATED ? PLATE_T + PLATE_BOSS : BLOCK_H);
 
-// Per-axis splay that adds up to LEG_TILT_SPEC of total lean:
+// Square legs stand plumb -- the splay is a mid-century idiom, not a nordic one
+LEG_TILT_EFF = SQUARE ? 0 : LEG_TILT_SPEC;
+
+// Per-axis splay that adds up to LEG_TILT_EFF of total lean:
 // cos(splay) * cos(splay) == cos(tilt).
-LEG_SPLAY  = acos(sqrt(cos(LEG_TILT_SPEC)));
-COSTILT    = cos(LEG_TILT_SPEC);
+LEG_SPLAY  = acos(sqrt(cos(LEG_TILT_EFF)));
+COSTILT    = cos(LEG_TILT_EFF);
 LEG_AXIS_L = LEG_LENGTH;                      // shoulder -> floor, along the leg
 
 LEG_RISE  = LEG_LENGTH * COSTILT + MOUNT_H;   // floor -> underside of case
@@ -337,7 +355,55 @@ module leg_ferrule(sx, sy) {
     }
 }
 
+// ---------------------------------------------------------------
+//  Square tapered leg, scandinavian.  Tapered on its two INNER faces only, so
+//  the outer faces stay plumb and continue the line of the case sides down to
+//  the floor.  That asymmetry is the whole character of the leg.
+// ---------------------------------------------------------------
+module corner_slab(w, dx, dy, h) {
+    translate([min(0, dx*w), min(0, dy*w), 0]) cube([w, w, h]);
+}
+
+function leg_xo(sx) = (sx < 0) ? SQ_INSET : W - SQ_INSET;
+function leg_yo(sy) = (sy < 0) ? SQ_INSET : DEPTH - SQ_INSET;
+
+module leg_square(sx, sy) {
+    dx = (sx < 0) ? 1 : -1;
+    dy = (sy < 0) ? 1 : -1;
+    color(WALNUT) hull() {
+        // runs 0.02 up into the case rather than stopping flush on its face
+        translate([leg_xo(sx), leg_yo(sy), -0.02]) corner_slab(SQ_TOP, dx, dy, 0.04);
+        translate([leg_xo(sx), leg_yo(sy), -LEG_LENGTH]) corner_slab(SQ_BOT, dx, dy, 0.02);
+    }
+}
+
+// Two blocks hugging the leg's inner faces.  Long grain to long grain on both
+// the leg and the underside of the case, which is why no hardware is needed.
+module leg_blocks(sx, sy) {
+    dx = (sx < 0) ? 1 : -1;
+    dy = (sy < 0) ? 1 : -1;
+    xo = leg_xo(sx); yo = leg_yo(sy);
+    o = 0.02;   // overlap into the leg and into the case underside
+    color(WALNUT3) {
+        translate([min(xo + dx*(SQ_TOP - o), xo + dx*(SQ_TOP + GB_XY)),
+                   min(yo, yo + dy*SQ_TOP), -GB_H])
+            cube([GB_XY + o, SQ_TOP, GB_H + o]);
+        translate([min(xo, xo + dx*SQ_TOP),
+                   min(yo + dy*(SQ_TOP - o), yo + dy*(SQ_TOP + GB_XY)), -GB_H])
+            cube([SQ_TOP, GB_XY + o, GB_H + o]);
+    }
+}
+
 module base(explode = 0) {
+    if (SQUARE) {
+        for (sx = [-1, 1], sy = [-1, 1]) {
+            translate([0, 0, -explode * 0.5]) leg_blocks(sx, sy);
+            translate([0, 0, -explode * 2.2]) leg_square(sx, sy);
+        }
+    } else base_round(explode);
+}
+
+module base_round(explode = 0) {
     for (sx = [-1, 1], sy = [-1, 1]) {
         px = (sx < 0) ? MOUNT_INSET : W - MOUNT_INSET - MOUNT_XY;
         py = (sy < 0) ? MOUNT_INSET : DEPTH - MOUNT_INSET - MOUNT_XY;
@@ -492,7 +558,10 @@ echo(EGG
      ? str("divider length      = ", hz(ROWS) + DADO_DIV - (row_z(0) - DADO_DIV),
            " x", COLS - 1, "  (notched ", LAP_Y, " deep at ", ROWS - 1, " crossings)")
      : str("divider length      = ", OPENING + 2*DADO_DIV, " x", ROWS * (COLS - 1)));
-echo(str("leg mount           = ", LEG_MOUNT));
-echo(str("leg length (bought) = ", LEG_LENGTH, "  at ", LEG_TILT_SPEC, " deg off plumb"));
-echo(str("  -> per-axis splay = ", LEG_SPLAY, " deg"));
+echo(str("leg style           = ", LEG_STYLE,
+         SQUARE ? "  (made: square, tapered inner faces, plumb)"
+                : str("  (bought: ", LEG_MOUNT, " mount, ", LEG_TILT_SPEC, " deg splay)")));
+echo(str("leg length          = ", LEG_LENGTH));
+echo(SQUARE ? str("  -> section        = ", SQ_TOP, " sq tapering to ", SQ_BOT)
+            : str("  -> per-axis splay = ", LEG_SPLAY, " deg"));
 echo(str("  -> rise to case   = ", LEG_RISE));

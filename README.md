@@ -33,6 +33,33 @@ position.
 Also: **[SOURCING.md](SOURCING.md)** — a self-contained brief for buying the
 materials.
 
+## Two builds from one model
+
+| | Mid-century (walnut) | Scandinavian (pine) |
+|---|---|---|
+| `LEG_STYLE` | `round` | `square` |
+| `DEPTH` | 9 | **9.25** — a 1x10 S4S is actually 9-1/4 |
+| Legs | bought, splayed 8&deg;, brass ferrules, angled steel plates | **made**: 1-1/2 sq tapering to 7/8, plumb, tapered on the two inner faces only |
+| Leg fixing | steel plate + hangar bolt | two glue blocks per leg, no hardware at all |
+| Overall height | 39-1/2 | 39-1/4 |
+| Lap slot depth | 4-1/2 | 4-5/8 |
+| Everything else | | *identical* |
+
+```sh
+openscad -D 'LEG_STYLE="square"' -D DEPTH=9.25 wine_rack.scad
+```
+
+Part lengths and all seven housing positions are the same in both, because every
+part is cut along the board and uses its full width — only the width and the lap
+depth follow `DEPTH`. So the pine build is a true rehearsal for the walnut one,
+not an approximation of it.
+
+The square leg is tapered on its **two inner faces only**, so the outer faces
+stay plumb and carry the line of the case sides down to the floor. That
+asymmetry is the whole character of the leg, and it is why the splayed
+mid-century version and this one read as different pieces of furniture rather
+than the same piece in two woods.
+
 ## Requirements
 
 ```sh

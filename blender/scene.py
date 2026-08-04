@@ -25,7 +25,7 @@ from mathutils import Vector
 # --------------------------------------------------------------------------
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 ap = argparse.ArgumentParser()
-ap.add_argument("--wood", default="walnut", choices=["walnut", "cherry"])
+ap.add_argument("--wood", default="walnut", choices=["walnut", "cherry", "pine"])
 ap.add_argument("--out", default="renders/beauty.png")
 ap.add_argument("--samples", type=int, default=256)
 ap.add_argument("--res", default="1400x1900")
@@ -48,6 +48,10 @@ WOODS = {
     # stripe of a zebrawood, and too much spread reads as a toy
     "walnut": ((0.375, 0.272, 0.198), (0.225, 0.150, 0.104)),
     "cherry": ((0.630, 0.372, 0.232), (0.450, 0.242, 0.150)),
+    # nordic pine: pale, and the grain contrast is HIGHER than in a hardwood --
+    # soft earlywood against hard latewood is exactly what makes pine look like
+    # pine rather than like a blonde hardwood
+    "pine":   ((0.855, 0.735, 0.540), (0.600, 0.440, 0.268)),
 }
 LIGHT, DARK = WOODS[args.wood]
 
@@ -124,7 +128,7 @@ def shade_smooth(obj, angle_deg=32):
 
 
 GROUPS = {
-    "wood_z": ["stile0", "stile1", "divider", "leg0", "leg1", "leg2", "leg3"],
+    "wood_z": ["stile0", "stile1", "divider", "leg0", "leg1", "leg2", "leg3", "blocks"],
     "wood_x": ["horiz%d" % i for i in range(7)],
     "brass": ["brass"],
     "steel": ["steel"],
