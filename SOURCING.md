@@ -113,10 +113,14 @@ Confirm the screw length against the actual plate thickness once chosen.
 
 | Item | Spec | Notes |
 |---|---|---|
-| Straight bit | **1/2" diameter**, cutting length **≥ 1"**, shank to match the router collet (1/4" or 1/2") | Not a 3/4" bit — housings are cut in two passes with a 1/2" so the fit can be dialled in to the real stock thickness |
-| Spiral upcut bit | 1/2" dia, optional upgrade | Cleaner in the through-slots; needs the right collet |
+| **Pattern bit** (top-bearing straight bit) | **1/2" diameter**, bearing OD **equal to** the cutter OD, cutting length ~1", shank to match the router collet | For the 14 housings. The equal bearing makes the cut reproduce the template one-to-one, so the jig can be set with a piece of the actual shelf stock — no measuring |
+| Straight or spiral upcut bit | **1/2" diameter**, cutting length **≥ 1"** | For the 10 lap slots, which are through-cuts guided by a straightedge rather than a template. Not a 3/4" bit |
 | Clamps | **4 minimum, 36" capacity** — parallel, F-style, or pipe clamps | Genuinely needed, not optional |
 | Plywood scrap | 1/2", for shop-made jigs | Offcuts fine |
+
+**Template stock:** 3/4" plywood or MDF for the housing jig. The thickness has to
+roughly equal (bit cutting length − housing depth) so the bearing rides on the
+template; 1/2" is too thin with a 1" cutter.
 
 **Not needed:** dado stack. A table saw is used only to rip the boards to a single
 width (the buyer has access to one) — all the joinery is router work.

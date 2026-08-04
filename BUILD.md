@@ -3,6 +3,9 @@
 Written for someone whose last project was a picture frame.
 Tools assumed: **table saw, router, mitre saw, hand tools.**
 
+There is an [illustrated version of this guide](https://claude.ai/code/artifact/a3f2afa2-34b5-4bcf-a35a-0f884b502578) with the jig drawings
+and part layouts inline — easier to follow at the bench.
+
 Read [CUTLIST.md](CUTLIST.md) alongside this — it has every dimension. This
 document is the order to do things in and the technique for each step.
 
