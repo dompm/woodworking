@@ -7,44 +7,80 @@ OpenSCAD model uses, so the guide can't drift from the design. Renders are
 downscaled and inlined as data URIs -- the published page has to be
 self-contained.
 
-    python3 make_guide.py   ->  guide.html
+    python3 make_guide.py             ->  guide.html            (wine rack)
+    python3 make_guide.py documents   ->  guide_documents.html  (document unit)
+
+Both pieces come out of one OpenSCAD model, so they come out of one generator
+too -- the joinery is identical and only the cell proportions differ.
 """
 import base64
 import io
+import math
 import os
+import sys
 from fractions import Fraction
 
 from PIL import Image
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
+# ---------------------------------------------------------------- which piece
+PIECE = sys.argv[1] if len(sys.argv) > 1 else "winerack"
+PIECES = {
+    "winerack":  dict(open_w=4.0,  open_h=4.0,  rows=6, depth=9.00, legs=True,
+                      title="Mid-century wine rack",
+                      lede="Twelve bottles in walnut or cherry, on splayed tapered "
+                           "legs. Written for a table saw, router, mitre saw and "
+                           "hand tools &mdash; and for someone whose last project "
+                           "was a picture frame.",
+                      stock="4/4 walnut, 9 in wide", hero="renders/beauty_walnut.png"),
+    "documents": dict(open_w=12.0, open_h=3.5,  rows=5, depth=9.25, legs=False,
+                      title="Document unit",
+                      lede="Ten cells for letter and A4 laid flat, in pine. The same "
+                           "joinery as the wine rack at a different scale &mdash; "
+                           "which is what makes it the right piece to build first.",
+                      stock="1x10 pine, 9-1/4 in actual",
+                      hero="renders/beauty_documents.png"),
+}
+if PIECE not in PIECES:
+    raise SystemExit("piece must be one of: " + ", ".join(PIECES))
+P = PIECES[PIECE]
+DOCS = (PIECE == "documents")
+
 # ---------------------------------------------------------------- model facts
 T          = 0.75
-DEPTH      = 9.00
-OPENING    = 4.00
-COLS, ROWS = 2, 6
+DEPTH      = P["depth"]
+OPENING_W  = P["open_w"]
+OPENING_H  = P["open_h"]
+COLS, ROWS = 2, P["rows"]
 DADO       = 0.25
 DADO_DIV   = 0.1875
 LAP_DEPTH  = DEPTH / 2
 LEG_LENGTH = 10.0
 LEG_TILT   = 8.0
+# scandinavian square leg
+SQ_TOP = 1.50
+SQ_BOT = 0.875
+SQ_POST = 1.50
 
-W = COLS * OPENING + (COLS + 1) * T          # 10.25
-H = ROWS * OPENING + (ROWS + 1) * T          # 29.25
-hz = lambda j: j * (OPENING + T)
+W = COLS * OPENING_W + (COLS + 1) * T
+H = ROWS * OPENING_H + (ROWS + 1) * T
+hz = lambda j: j * (OPENING_H + T)
 
-STILE_LEN  = H                                # 29.25
-HORIZ_LEN  = W - 2 * T + 2 * DADO             # 9.25
+STILE_LEN  = H
+HORIZ_LEN  = W - 2 * T + 2 * DADO
 DIV_Z0     = hz(0) + T - DADO_DIV
-DIV_LEN    = hz(ROWS) + DADO_DIV - DIV_Z0     # 28.125
+DIV_LEN    = hz(ROWS) + DADO_DIV - DIV_Z0
 DIV_SLOTS  = [hz(j) - DIV_Z0 for j in range(1, ROWS)]
 STILE_DADO = [hz(j) for j in range(ROWS + 1)]
-SHELF_SLOT_X = (T - DADO)                     # shelf starts here in case coords
-SLOT_FROM_END = (COLS * OPENING + (COLS + 1) * T) / 2 - T / 2 - SHELF_SLOT_X
+SHELF_SLOT_X = (T - DADO)
+SLOT_FROM_END = W / 2 - T / 2 - SHELF_SLOT_X
 
-import math
+PARTS_LEN = 2 * STILE_LEN + (ROWS + 1) * HORIZ_LEN + DIV_LEN
+MATERIAL_FT = PARTS_LEN / 12 * 1.35 + 2      # parts, waste, test offcuts
+
 LEG_RISE  = LEG_LENGTH * math.cos(math.radians(LEG_TILT)) + 0.325
-OVERALL_H = H + LEG_RISE
+OVERALL_H = H + (LEG_RISE if P["legs"] else 0.0)
 
 
 def frac(x, denom=16):
@@ -205,6 +241,275 @@ def svg_pattern_bit():
     return "\n".join(o)
 
 
+def svg_scandi_leg():
+    """Square tapered leg: elevation plus a plan showing which two faces get
+    the taper.  Getting that wrong is the only way to ruin one."""
+    S = 34.0
+    pad_l, pad_t = 84, 44
+    LH = LEG_LENGTH * S
+    top_w, bot_w, post = SQ_TOP * S, SQ_BOT * S, SQ_POST * S
+    x0, y0 = pad_l, pad_t
+    plan_x, plan_y = pad_l + top_w + 190, pad_t + 30
+    ww, hh = plan_x + top_w + 130, y0 + LH + 62
+
+    o = [f'<svg viewBox="0 0 {ww:.0f} {hh:.0f}" class="dwg" role="img" '
+         f'aria-label="Square tapered leg, elevation and plan">']
+    # elevation: outer face plumb on the left, inner face tapering on the right
+    o.append(f'<path class="wp" d="M {x0} {y0} H {x0+top_w:.1f} '
+             f'V {y0+post:.1f} L {x0+bot_w:.1f} {y0+LH:.1f} '
+             f'H {x0} V {y0} Z"/>')
+    o.append(f'<line class="tick" x1="{x0}" y1="{y0+post:.1f}" '
+             f'x2="{x0+top_w:.1f}" y2="{y0+post:.1f}" stroke-dasharray="4 3"/>')
+    o.append(f'<text class="edge" x="{x0-8}" y="{y0+post/2+4:.1f}" text-anchor="end">'
+             f'SQUARE POST</text>')
+    o.append(f'<text class="note" x="{x0-8}" y="{y0+post/2+17:.1f}" text-anchor="end">'
+             f'blocks glue here</text>')
+    o.append(f'<text class="edge front" x="{x0+top_w+10:.1f}" y="{y0+LH*0.62:.1f}">'
+             f'TAPER</text>')
+    o.append(f'<text class="lbl" x="{x0-8}" y="{y0-14}" text-anchor="end">OUTER FACE</text>')
+    o.append(f'<text class="note" x="{x0-8}" y="{y0-2}" text-anchor="end">stays plumb</text>')
+
+    # dimensions
+    dy = y0 - 22
+    o.append(f'<line class="dim" x1="{x0}" y1="{dy}" x2="{x0+top_w:.1f}" y2="{dy}"/>')
+    o.append(f'<text class="num" x="{x0+top_w/2:.1f}" y="{dy-6}" text-anchor="middle">'
+             f'{frac(SQ_TOP)}"</text>')
+    fy = y0 + LH + 20
+    o.append(f'<line class="dim" x1="{x0}" y1="{fy}" x2="{x0+bot_w:.1f}" y2="{fy}"/>')
+    o.append(f'<text class="num" x="{x0+bot_w/2:.1f}" y="{fy+17}" text-anchor="middle">'
+             f'{frac(SQ_BOT)}"</text>')
+    lx = x0 - 62
+    o.append(f'<line class="dim" x1="{lx}" y1="{y0}" x2="{lx}" y2="{y0+LH:.1f}"/>')
+    o.append(f'<text class="num" x="{lx-6}" y="{y0+LH/2:.1f}" text-anchor="end">'
+             f'{frac(LEG_LENGTH)}"</text>')
+    o.append(f'<line class="dim" x1="{lx+22}" y1="{y0}" x2="{lx+22}" y2="{y0+post:.1f}"/>')
+    o.append(f'<text class="num" x="{lx+16}" y="{y0+post/2+4:.1f}" text-anchor="end">'
+             f'{frac(SQ_POST)}"</text>')
+
+    # plan at the top of the leg, showing which faces taper
+    o.append(f'<rect class="wp" x="{plan_x}" y="{plan_y}" '
+             f'width="{top_w:.1f}" height="{top_w:.1f}"/>')
+    o.append(f'<text class="lbl" x="{plan_x}" y="{plan_y-32}">PLAN AT THE TOP</text>')
+    o.append(f'<text class="edge" x="{plan_x - 8}" y="{plan_y - 8}" text-anchor="end">'
+             f'case corner</text>')
+    o.append(f'<circle cx="{plan_x}" cy="{plan_y}" r="4" fill="var(--brass)"/>')
+    # arrows on the two inner faces
+    o.append(f'<path class="arrow" d="M {plan_x+top_w+26:.1f} {plan_y+top_w/2:.1f} '
+             f'H {plan_x+top_w+5:.1f}"/>')
+    o.append(f'<path class="arrow" d="M {plan_x+top_w/2:.1f} {plan_y+top_w+26:.1f} '
+             f'V {plan_y+top_w+5:.1f}"/>')
+    o.append(f'<text class="warn" x="{plan_x+top_w+32:.1f}" y="{plan_y+top_w/2+4:.1f}">'
+             f'taper</text>')
+    o.append(f'<text class="warn" x="{plan_x+top_w/2:.1f}" y="{plan_y+top_w+42:.1f}" '
+             f'text-anchor="middle">taper</text>')
+    o.append(f'<text class="note" x="{plan_x}" y="{plan_y+top_w+62:.1f}">'
+             f'all four legs are the same part, rotated</text>')
+    o.append("</svg>")
+    return "\n".join(o)
+
+
+BOARD_LEN = 96.0      # 8 ft
+KERF      = 0.125
+END_TRIM  = 1.0       # squared off each end before anything else
+
+
+def pack_boards():
+    """First-fit-decreasing onto 8-foot boards.  Not optimal, but it is what a
+    person actually does at the bench: cut the longest parts first."""
+    parts = ([("stile", STILE_LEN)] * 2
+             + [("shelf/rail", HORIZ_LEN)] * (ROWS + 1)
+             + [("divider", DIV_LEN)])
+    parts.sort(key=lambda t: -t[1])
+    boards = []
+    for name, ln in parts:
+        for b in boards:
+            if b["free"] >= ln + KERF:
+                b["parts"].append((name, ln)); b["free"] -= ln + KERF; break
+        else:
+            boards.append({"parts": [(name, ln)],
+                           "free": BOARD_LEN - 2 * END_TRIM - ln - KERF})
+    return boards
+
+
+def svg_cutlayout():
+    """Where every part comes from.  Cutting to a plan rather than to the next
+    free bit of board is most of the difference between three boards and four."""
+    S = 9.2
+    pad_l, pad_t, row_h, gap = 78, 34, 40, 20
+    boards = pack_boards()
+    ww = pad_l + BOARD_LEN * S + 96
+    hh = pad_t + len(boards) * (row_h + gap) + 38
+    o = [f'<svg viewBox="0 0 {ww:.0f} {hh:.0f}" class="dwg" role="img" '
+         f'aria-label="Cutting layout across {len(boards)} boards">']
+    for i, b in enumerate(boards):
+        y = pad_t + i * (row_h + gap)
+        o.append(f'<rect class="wp" x="{pad_l}" y="{y}" '
+                 f'width="{BOARD_LEN*S:.1f}" height="{row_h}"/>')
+        o.append(f'<text class="lbl" x="{pad_l-10}" y="{y+row_h/2+4}" '
+                 f'text-anchor="end">BOARD {i+1}</text>')
+        x = pad_l + END_TRIM * S
+        for name, ln in b["parts"]:
+            o.append(f'<rect class="cut" x="{x:.1f}" y="{y}" '
+                     f'width="{ln*S:.1f}" height="{row_h}"/>')
+            o.append(f'<text class="num" x="{x + ln*S/2:.1f}" y="{y+row_h/2-2}" '
+                     f'text-anchor="middle">{frac(ln)}"</text>')
+            o.append(f'<text class="note" x="{x + ln*S/2:.1f}" y="{y+row_h/2+11}" '
+                     f'text-anchor="middle">{name}</text>')
+            x += (ln + KERF) * S
+        spare = pad_l + (BOARD_LEN - END_TRIM) * S - x
+        if spare > 26:
+            o.append(f'<text class="note" x="{x + spare/2:.1f}" y="{y+row_h/2+4}" '
+                     f'text-anchor="middle">{frac(spare/S)}" spare</text>')
+    o.append(f'<text class="note" x="{pad_l}" y="{hh-12}">'
+             f'{len(boards)} boards. Allows {frac(END_TRIM)}" trimmed off each end and a '
+             f'{frac(KERF)}" kerf per cut. Spare on the last board is your test stock.'
+             f'</text>')
+    o.append("</svg>")
+    return "\n".join(o)
+
+
+def svg_fit():
+    """Why step 4 matters, in one picture: the same housing against three
+    different shelf thicknesses."""
+    S, pw, gap, pad = 62.0, 210, 26, 22
+    stile_t, hs = T * S, T * S
+    cases = [("too tight", +0.045, "var(--wine)", "splits the stile as you clamp"),
+             ("correct",    0.0,   "var(--brass)", "slides with hand pressure"),
+             ("too loose", -0.045, "var(--wine)", "a gap you will see forever")]
+    hh = pad + 200 + 52
+    o = [f'<svg viewBox="0 0 {pad*2 + 3*pw + 2*gap:.0f} {hh:.0f}" class="dwg" '
+         f'role="img" aria-label="Housing fit: too tight, correct, too loose">']
+    for i, (name, delta, col, note) in enumerate(cases):
+        x0 = pad + i * (pw + gap)
+        ytop, hgt = pad + 16, 150
+        # stile in section, housing notched into its right face
+        o.append(f'<path class="wp" d="M {x0} {ytop} H {x0+stile_t:.1f} '
+                 f'V {ytop+hgt/2-hs/2:.1f} H {x0+stile_t-DADO*S:.1f} '
+                 f'V {ytop+hgt/2+hs/2:.1f} H {x0+stile_t:.1f} V {ytop+hgt:.1f} '
+                 f'H {x0} Z"/>')
+        # the shelf end, thickness varying by delta
+        th = (T + delta) * S
+        o.append(f'<rect class="cut" x="{x0+stile_t-DADO*S:.1f}" '
+                 f'y="{ytop+hgt/2-th/2:.1f}" width="{pw*0.62:.1f}" height="{th:.1f}" '
+                 f'style="fill:{col};fill-opacity:.55"/>')
+        o.append(f'<text class="lbl" x="{x0}" y="{ytop-8}" style="fill:{col}">'
+                 f'{name.upper()}</text>')
+        o.append(f'<text class="note" x="{x0}" y="{ytop+hgt+20}">{note}</text>')
+    o.append(f'<text class="note" x="{pad}" y="{hh-10}">The housing is a fixed '
+             f'{frac(DADO)}&#8221; deep. What changes is your stock.</text>')
+    o.append("</svg>")
+    return "\n".join(o)
+
+
+def svg_clamping():
+    """Where the clamps and cauls go.  Six across the width, one at nearly every
+    housing, and a caul each side so the pressure reaches between them."""
+    S = 12.0
+    pad_l, pad_t = 96, 30
+    cw, ch = W * S, H * S
+    ww, hh = pad_l + cw + 210, pad_t * 2 + ch + 40
+    o = [f'<svg viewBox="0 0 {ww:.0f} {hh:.0f}" class="dwg" role="img" '
+         f'aria-label="Clamp and caul placement">']
+    o.append(f'<rect class="wp" x="{pad_l}" y="{pad_t}" width="{cw:.1f}" height="{ch:.1f}"/>')
+    for j in range(ROWS):
+        for i in range(COLS):
+            ox = pad_l + (T + i * (OPENING_W + T)) * S
+            oy = pad_t + ch - (hz(j) + T + OPENING_H) * S
+            o.append(f'<rect class="void" x="{ox:.1f}" y="{oy:.1f}" '
+                     f'width="{OPENING_W*S:.1f}" height="{OPENING_H*S:.1f}"/>')
+    # cauls, outside each stile
+    for cx in (pad_l - 11, pad_l + cw + 3):
+        o.append(f'<rect x="{cx:.1f}" y="{pad_t}" width="8" height="{ch:.1f}" '
+                 f'style="fill:var(--brass);fill-opacity:.5;stroke:var(--ink);'
+                 f'stroke-opacity:.4;stroke-width:.8"/>')
+    o.append(f'<text class="lbl" x="{pad_l-18}" y="{pad_t-10}" text-anchor="end">CAUL</text>')
+    # a clamp at every housing
+    for j in range(ROWS + 1):
+        y = pad_t + ch - (hz(j) + T / 2) * S
+        o.append(f'<line x1="{pad_l-34:.1f}" y1="{y:.1f}" x2="{pad_l+cw+34:.1f}" '
+                 f'y2="{y:.1f}" style="stroke:var(--wine);stroke-width:2.4"/>')
+        for jx in (pad_l - 34, pad_l + cw + 26):
+            o.append(f'<rect x="{jx:.1f}" y="{y-9:.1f}" width="8" height="18" '
+                     f'style="fill:var(--wine)"/>')
+    o.append(f'<text class="warn" x="{pad_l+cw+46:.1f}" y="{pad_t+ch/2:.1f}">'
+             f'{ROWS+1} clamps, one per housing</text>')
+    o.append(f'<text class="note" x="{pad_l}" y="{hh-24}">Snug, not crushing.</text>')
+    o.append(f'<text class="note" x="{pad_l}" y="{hh-10}">The housings locate '
+             f'everything; the clamps only hold it while the glue cures.</text>')
+    o.append("</svg>")
+    return "\n".join(o)
+
+
+def svg_rail():
+    """The end rail in plan.  It is the only part carrying three different cuts,
+    so it is worth drawing on its own."""
+    S = 26.0
+    pad_l, pad_t = 60, 46
+    bw, bh = HORIZ_LEN * S, DEPTH * S
+    ww, hh = pad_l + bw + 60, pad_t + bh + 74
+    o = [f'<svg viewBox="0 0 {ww:.0f} {hh:.0f}" class="dwg" role="img" '
+         f'aria-label="End rail in plan with its divider housing">']
+    o.append(f'<rect class="wp" x="{pad_l}" y="{pad_t}" width="{bw:.1f}" height="{bh:.1f}"/>')
+    # end rabbets, one at each end
+    for x in (pad_l, pad_l + bw - DADO * S):
+        o.append(f'<rect class="cut end" x="{x:.1f}" y="{pad_t}" '
+                 f'width="{DADO*S:.1f}" height="{bh:.1f}"/>')
+    # divider housing, through, on one face only
+    hx = pad_l + SLOT_FROM_END * S
+    o.append(f'<rect class="cut" x="{hx:.1f}" y="{pad_t}" width="{T*S:.1f}" '
+             f'height="{bh:.1f}"/>')
+    dy = pad_t + bh + 20
+    o.append(f'<line class="dim" x1="{pad_l}" y1="{dy}" x2="{hx:.1f}" y2="{dy}"/>')
+    o.append(f'<text class="num" x="{(pad_l+hx)/2:.1f}" y="{dy+17}" text-anchor="middle">'
+             f'{frac(SLOT_FROM_END)}"</text>')
+    o.append(f'<line class="dim" x1="{hx+T*S:.1f}" y1="{dy}" x2="{pad_l+bw:.1f}" y2="{dy}"/>')
+    o.append(f'<text class="num" x="{(hx+T*S+pad_l+bw)/2:.1f}" y="{dy+17}" '
+             f'text-anchor="middle">{frac(SLOT_FROM_END)}"</text>')
+    o.append(f'<text class="lbl" x="{pad_l}" y="{pad_t-24}">END RAIL &#215;2</text>')
+    o.append(f'<text class="note" x="{pad_l}" y="{pad_t-10}">'
+             f'{frac(HORIZ_LEN)}&#8221; long &#183; the same blank as a shelf</text>')
+    o.append(f'<text class="edge front" x="{pad_l+bw+8:.1f}" y="{pad_t+14:.1f}">'
+             f'rabbet {frac(DADO)}&#8221;</text>')
+    o.append(f'<text class="warn" x="{hx+T*S+8:.1f}" y="{pad_t+bh-8:.1f}">'
+             f'housing {frac(DADO_DIV)}&#8221; deep, ONE face only</text>')
+    o.append(f'<text class="note" x="{pad_l}" y="{hh-10}">Bottom rail: housing on its '
+             f'top face. Top rail: on its bottom face.</text>')
+    o.append("</svg>")
+    return "\n".join(o)
+
+
+def svg_square():
+    """Measuring diagonals is the only check that catches a racked case, and it
+    has to happen before the glue grabs."""
+    S = 11.0
+    pad = 46
+    cw, ch = W * S, H * S
+    ww, hh = pad * 2 + cw + 120, pad * 2 + ch + 22
+    o = [f'<svg viewBox="0 0 {ww:.0f} {hh:.0f}" class="dwg" role="img" '
+         f'aria-label="Check the diagonals">']
+    o.append(f'<rect class="wp" x="{pad}" y="{pad}" width="{cw:.1f}" height="{ch:.1f}"/>')
+    for j in range(ROWS):
+        for i in range(COLS):
+            ox = pad + (T + i * (OPENING_W + T)) * S
+            oy = pad + ch - (hz(j) + T + OPENING_H) * S
+            o.append(f'<rect class="void" x="{ox:.1f}" y="{oy:.1f}" '
+                     f'width="{OPENING_W*S:.1f}" height="{OPENING_H*S:.1f}"/>')
+    for x1, y1, x2, y2 in ((pad, pad, pad + cw, pad + ch),
+                           (pad + cw, pad, pad, pad + ch)):
+        o.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
+                 f'style="stroke:var(--wine);stroke-width:2;stroke-dasharray:7 5"/>')
+    import math as _m
+    diag = _m.hypot(W, H)
+    o.append(f'<text class="warn" x="{pad+cw+14:.1f}" y="{pad+ch/2-6:.1f}">'
+             f'both diagonals</text>')
+    o.append(f'<text class="warn" x="{pad+cw+14:.1f}" y="{pad+ch/2+10:.1f}">'
+             f'{frac(diag,8)}&#8221; if square</text>')
+    o.append(f'<text class="note" x="{pad}" y="{hh-10}">If they differ, push the long '
+             f'diagonal until they match. Do it before the glue grabs, not after.</text>')
+    o.append("</svg>")
+    return "\n".join(o)
+
+
 def svg_elevation():
     s = 13.0
     pad_l, pad_t, pad_r, pad_b = 104, 38, 120, 26
@@ -218,10 +523,10 @@ def svg_elevation():
     o.append(f'<rect class="wp" x="{pad_l}" y="{top}" width="{cw:.1f}" height="{ch:.1f}"/>')
     for j in range(ROWS):
         for i in range(COLS):
-            ox = pad_l + (T + i * (OPENING + T)) * s
-            oy = top + ch - (hz(j) + T + OPENING) * s
+            ox = pad_l + (T + i * (OPENING_W + T)) * s
+            oy = top + ch - (hz(j) + T + OPENING_H) * s
             o.append(f'<rect class="void" x="{ox:.1f}" y="{oy:.1f}" '
-                     f'width="{OPENING*s:.1f}" height="{OPENING*s:.1f}"/>')
+                     f'width="{OPENING_W*s:.1f}" height="{OPENING_H*s:.1f}"/>')
     # legs
     foot = top + total
     spread = LEG_LENGTH * math.sin(math.radians(LEG_TILT)) / math.sqrt(2)
@@ -240,9 +545,9 @@ def svg_elevation():
     o.append(f'<line class="dim" x1="{xl}" y1="{top}" x2="{xl}" y2="{top+ch:.1f}"/>')
     o.append(f'<text class="num" x="{xl-7}" y="{top+ch/2:.1f}" text-anchor="end">'
              f'{frac(H)}" case</text>')
-    oy = top + ch - (hz(0) + T + OPENING) * s
-    o.append(f'<text class="num" x="{pad_l + (T+OPENING/2)*s:.1f}" y="{oy+OPENING*s/2+4:.1f}" '
-             f'text-anchor="middle">{frac(OPENING)}"</text>')
+    oy = top + ch - (hz(0) + T + OPENING_H) * s
+    o.append(f'<text class="num" x="{pad_l + (T+OPENING_W/2)*s:.1f}" y="{oy+OPENING_H*s/2+4:.1f}" '
+             f'text-anchor="middle">{frac(OPENING_W)}&#215;{frac(OPENING_H)}"</text>')
     o.append("</svg>")
     return "\n".join(o)
 
@@ -402,18 +707,22 @@ def step(n, title, body):
 </div></section>"""
 
 
-def figure(src, cap, wide=True, raster=True):
+def figure(src, cap="", wide=True, raster=True):
     cls = ' class="wide"' if wide else ""
     inner = f'<img src="{src}" alt="{cap}" loading="lazy">' if raster else src
     return f'<figure{cls}>{inner}<figcaption>{cap}</figcaption></figure>'
 
 
 def build():
-    hero = img("renders/beauty_walnut.png", 1000, 80)
+    hero = img(P["hero"], 1000, 80)
     jd = img("renders/jigs/dado.png", 860, 76)
+    rip = img("renders/jigs/ripsled.png", 860, 76)
+    stopb = img("renders/jigs/stopblock.png", 860, 76)
     jd2 = img("renders/jigs/dado_pass2.png", 860, 76)
     uj = img("renders/jigs/ujig.png", 860, 76)
     ujb = img("renders/jigs/ujig_bearing.png", 860, 76)
+    sbase = img("renders/scandi_base.png", 820, 78)
+    spine = img("renders/beauty_pine.png", 900, 80)
     jp = img("renders/jigs/dado_pair.png", 860, 76)
     js_ = img("renders/jigs/slot.png", 860, 76)
     lap = img("renders/lap.png", 780, 76)
@@ -423,62 +732,97 @@ def build():
     base = img("renders/base.png", 780, 76)
 
     cut_rows = [
-        ("A", "Stile (side)", 2, f'3/4 &times; {frac(DEPTH)} &times; {frac(STILE_LEN)}'),
-        ("B", "Horizontal &mdash; 2 rails + 5 shelves, all one blank", 7,
+        ("A", "Stile (side)", 2,
+         f'3/4 &times; {frac(DEPTH)} &times; {frac(STILE_LEN)}'),
+        ("B", f"Horizontal &mdash; 2 rails + {ROWS-1} shelves, all one blank", ROWS + 1,
          f'3/4 &times; {frac(DEPTH)} &times; {frac(HORIZ_LEN)}'),
         ("C", "Divider, one continuous piece", 1,
          f'3/4 &times; {frac(DEPTH)} &times; {frac(DIV_LEN)}'),
+    ] + ([
         ("D", "Angled leg plate, 8&deg;, + hangar bolt", 4, "steel, 2-3/8 sq"),
         ("E", "Tapered leg", 4, f'{frac(LEG_LENGTH)}" long, bought'),
         ("F", "Brass ferrule", 4, "7/8 ID"),
-    ]
+    ] if P["legs"] else [])
     rows = "".join(
         f'<tr><td class="n">{a}</td><td>{b}</td><td class="n">{c}</td><td class="n">{d}</td></tr>'
         for a, b, c, d in cut_rows)
 
     steps = []
 
-    steps.append(step(1, "Lock the two things you don't control", f"""
-<p>Both of these decide dimensions downstream, so settle them before any wood is cut.</p>
-<p><b>Buy the legs first.</b> You want {frac(LEG_LENGTH)}&Prime; tapered legs with brass
-ferrules and <b>8&deg; angled mounting plates</b>. Check the plates are angled &mdash; plenty
-of sellers ship flat 0&deg; ones by default. A {frac(LEG_LENGTH)}&Prime; leg gives
-{frac(OVERALL_H,8)}&Prime; overall.</p>
+    steps.append(step(1, "Lock the thing you don't control", f"""
+<p>{"Two things drive every other dimension and both are outside your control, so settle them first." if P["legs"] else "One thing drives every other dimension, so settle it first."}</p>
+""" + ("""
+<p><b>Buy the legs first.</b> You want 10&Prime; tapered legs with brass ferrules and
+<b>8&deg; angled mounting plates</b>. Check the plates are angled &mdash; plenty of
+sellers ship flat 0&deg; ones by default.</p>
 <p><b>Ask what board width your yard actually stocks, surfaced.</b> Whatever you get
-becomes the case depth. Don't design around {frac(DEPTH)}&Prime; and then find out.</p>
+becomes the case depth.</p>""" if P["legs"] else f"""
+<p><b>The board width becomes the case depth.</b> A nominal 1&times;10 is actually
+<b>{frac(DEPTH)}&Prime;</b>, not 10 &mdash; softwood is sold nominal. Everything below
+assumes that number; if yours differs, set <span class="mono">DEPTH</span> in the model
+and re-read the cut list.</p>
+<p><b>Check {frac(W)}&Prime; against wherever this is going.</b> That width is not a
+style choice &mdash; it is two columns of letter-width cells and there is nothing to
+negotiate. Measure the closet before you buy wood.</p>
+<div class="callout"><span class="k">Legal paper will not fit</span>
+<p>Cells are {frac(OPENING_W)}&Prime; wide, which takes letter (11&Prime;) and A4
+(11.69&Prime;) laid flat with room to spare. Legal is 14&Prime; long and will never
+go in. If you need legal, the cell width has to change and so does everything else.</p>
+</div>""") + """
 <div class="callout"><span class="k">The one thing to get right</span>
-<p>Every part uses the <b>full width of the board</b>, and those edges become the visible
-front and back edges of the case. So all your stock has to finish at exactly the same
-width.</p></div>"""))
+<p>Every part uses the <b>full width of the board</b>, and those edges become the
+visible front and back edges of the case. So all your stock has to finish at exactly
+the same width.</p></div>"""))
 
-    steps.append(step(2, "Bring every board to one width", """
+    steps.append(step(2, "Bring every board to one width", f"""
 <p>With no jointer: screw or tape each board to a straight strip of plywood, run the
 plywood against the table saw fence, and the blade gives you a dead-straight edge.
 Then flip that edge to the fence and rip every board to final width
 <b>at one fence setting</b>. Don't move the fence between boards.</p>
+{figure(rip, "Straight-line ripping. The board is fixed to a straight plywood sled and the SLED rides the fence &mdash; nothing references the rough edge. The blade then makes the second edge parallel to the first.")}
 <p>Check three of them with calipers. They must match. A board 1/64&Prime; narrow means a
 shelf sits proud at the front of the case permanently.</p>"""))
 
     steps.append(step(3, "Cut the parts to length", f"""
 <p>Mitre saw with a <b>stop block</b>, or a crosscut sled. Never measure each piece
 individually.</p>
+{figure(stopb, "The stop block is what makes identical parts. Slide the board until it touches the stop, cut, repeat &mdash; the length is set by the setup, not by your pencil line.")}
+<div class="callout"><span class="k">Check your saw crosses {frac(DEPTH)}&Prime; first</span>
+<p>Every cut here is <em>across</em> the board's width. A <b>non-sliding</b> mitre saw
+tops out around 5-3/4&Prime; (10&Prime;) or 7-3/4&Prime; (12&Prime;) and will not reach.
+You need a <b>sliding</b> mitre saw, or a table saw crosscut sled.</p>
+<p>Don't cut halfway and flip the board to meet in the middle. It works in general, but
+these are the parts that have to match each other, and any misalignment between the two
+passes leaves a step exactly at the joint line.</p></div>
+<p><b>Check the fence is square before you cut anything real.</b> Across
+{frac(DEPTH)}&Prime; a fence off by half a degree puts the ends 0.08&Prime; out of
+square, the shelf then seats skewed in its housing, and the case leans. Cut a test
+piece, flip one half over and butt the two cut edges together &mdash; any error doubles
+and becomes obvious.</p>
+<p>Support the offcut. A {frac(HORIZ_LEN)}&Prime; piece hanging in mid-air droops as you
+finish the cut, pinches the blade and burns.</p>
 <div class="tablewrap"><table>
 <thead><tr><th>Part</th><th>What</th><th>Qty</th><th>Size (in)</th></tr></thead>
 <tbody>{rows}</tbody></table></div>
-<p>The seven B parts set the case width. If they differ from each other the case racks
-and no amount of clamping fixes it. One stop setting, seven cuts.</p>
+<p>The {ROWS+1} B parts set the case width. If they differ from each other the case
+racks and no amount of clamping fixes it. One stop setting, {ROWS+1} cuts.</p>
+{figure(svg_cutlayout(), raster=False, cap="Where every part comes from. Cutting to a plan rather than to the next free bit of board is most of the difference between three boards and four &mdash; and the spare on the last one is the test stock you need in step 6.")}
+<p><b>Cut the longest parts first.</b> If you start with the short ones you will find
+yourself two feet short of a stile with only offcuts left. Lay out every part in pencil
+on the boards before the saw runs, and put the knots where they will be cut away.</p>
 <p><b>Label every part in pencil, and mark which edge is the FRONT.</b> That matters in
 step 8 and it is not recoverable later.</p>
 <p>Cut two extra offcuts for test joints. Don't skip them.</p>"""))
 
-    steps.append(step(4, "Measure your actual stock thickness", """
+    steps.append(step(4, "Measure your actual stock thickness", f"""
 <p>Put calipers on your &ldquo;3/4 inch&rdquo; boards. They will read something like
 <span class="mono">0.72</span>&Prime; or <span class="mono">0.74</span>&Prime;.
 <b>Write that number on the wall.</b> Every housing you cut has to match it, not the
 nominal 3/4&Prime;.</p>
 <div class="callout"><span class="k">Most common way first projects go wrong</span>
 <p>Cutting housings to nominal 3/4&Prime; when the wood is 0.72&Prime;. Every joint in the
-piece ends up sloppy and there is no fixing it afterwards.</p></div>"""))
+piece ends up sloppy and there is no fixing it afterwards.</p></div>
+{figure(svg_fit(), raster=False, cap="The same " + frac(DADO) + "&Prime;-deep housing against three shelf thicknesses. You are not aiming at a number, you are aiming at the middle one.")}"""))
 
     steps.append(step(5, "Build the T-square jig", f"""
 <p>A strip of 1/2&Prime; plywood about 30&Prime; long, with a shorter piece fixed across one
@@ -549,6 +893,17 @@ front to back. Measured from the <b>bottom end</b> to the <b>lower edge</b> of e
 <p>All 3/4&Prime; wide &times; <b>{frac(LAP_DEPTH)}&Prime; deep</b>, cut in from an edge, all the
 way through the thickness. Five in the shelves, five in the divider.</p>
 {figure(svg_slots(), "The shelves are slotted from the BACK edge, the divider from the FRONT. Get this backwards and the grid will not assemble.", raster=False)}
+<div class="tablewrap"><table>
+<thead><tr><th>Cut in</th><th>From which edge</th><th>Position</th></tr></thead>
+<tbody>
+<tr><td>The {ROWS-1} shelves</td><td class="n">BACK</td>
+<td class="n">{frac(SLOT_FROM_END)} to {frac(SLOT_FROM_END + T)} from either end</td></tr>
+<tr><td>The divider</td><td class="n">FRONT</td>
+<td class="n">{", ".join(frac(v) for v in DIV_SLOTS)} from the bottom end</td></tr>
+</tbody></table></div>
+<p class="mono" style="color:var(--muted);font-size:.85rem">Positions are to the lower /
+nearer edge of each slot. All {2*(ROWS-1)} are {frac(T)}&Prime; wide &times;
+{frac(LAP_DEPTH)}&Prime; deep.</p>
 {figure(js_, "The slot setup: straightedge for the router to follow, a stop block (red) that ends the cut at the right depth, and a sacrificial board underneath because these cuts go all the way through.")}
 <p>Three or four depth passes &mdash; don't try to hog {frac(T)}&Prime; of walnut in one go.
 Cut the slot a hair fat so the parts go together without forcing.</p>
@@ -563,6 +918,7 @@ does that job there.</p>
 <span class="mono">{frac(SLOT_FROM_END)}&Prime;</span> to
 <span class="mono">{frac(SLOT_FROM_END + T)}&Prime;</span> from either end. Bottom rail on
 its top face only; top rail on its bottom face only.</p>
+{figure(svg_rail(), raster=False, cap="The end rail carries three cuts: a rabbet at each end where the stile lands, and one shallow housing for the divider. It is otherwise the same blank as a shelf.")}
 {figure(joint, "The corner: the stiles run the full height and the end rails land in a 1/4&Prime; rabbet, which is the same cut as a housing, just run off the end of the board.")}"""))
 
     steps.append(step(10, "Dry fit &mdash; twice", f"""
@@ -575,9 +931,10 @@ stands square on its own.</p>
 <p>It is full depth everywhere except at its five notches, and a full-depth section
 can't pass a shelf &mdash; the shelf's slot only removes the back half. Assemble the grid
 with a horizontal slide, never a vertical drop.</p></div>
-<p>Measure the openings while it's dry; they should all be {frac(OPENING)}&Prime;.</p>
-<p><b>Then the whole carcass</b>, dry, no glue. Measure the diagonals of the front face
-&mdash; they must match. Fix problems now.</p>"""))
+<p>Measure the openings while it's dry; they should all be {frac(OPENING_W)} &times; {frac(OPENING_H)}&Prime;.</p>
+<p><b>Then the whole carcass</b>, dry, no glue.</p>
+{figure(svg_square(), raster=False, cap="The only check that catches a racked case. Measure corner to corner both ways; if the numbers differ, push on the long diagonal until they agree.")}
+<p>Fix problems now. Once glue is on twelve housings you have minutes, not hours.</p>"""))
 
     steps.append(step(11, "Glue up, in two stages", f"""
 <p>Do it in two stages. Landing fourteen housings and ten lap joints in one go is the
@@ -590,18 +947,37 @@ it cure. You now have one rigid grid instead of six loose parts.</p>
 {figure(expl, "One stile flat on the bench; the two end rails and the cured egg crate into their housings; the second stile lowered onto all seven shelf ends at once.")}
 <ul class="tight">
 <li>Thin glue in the housing, not on the shelf end &mdash; less squeeze-out to clean.</li>
-<li>One clamp per pair of shelves, with cauls. Snug, not crushing.</li>
+</ul>
+{figure(svg_clamping(), raster=False, cap="Clamp at every housing, with a caul down each stile. A clamp bearing straight on the stile closes the joint beside it and much less four inches away; the caul is what carries the pressure between them.")}
+<ul class="tight">
 <li>Check the diagonals and rack it square before the glue grabs.</li>
 <li>Wipe squeeze-out inside the cells now. Dried glue blocks finish and shows as pale
 patches.</li>
 </ul>
 <p>Leave it overnight.</p>"""))
 
-    steps.append(step(12, "Base, then finish", f"""
+    if DOCS:
+        steps.append(step(12, "Finish", f"""
+<p>No base and no legs &mdash; it sits flat. That is one whole operation you do not have
+to do on your first piece.</p>
+<ul class="tight">
+<li>Sand 120 &rarr; 180 &rarr; 220. Break every sharp edge, especially the front edges
+of the cells, which get touched constantly.</li>
+<li>Vacuum, then wipe with a barely damp cloth and let it dry.</li>
+</ul>
+<div class="callout"><span class="k">Oil will turn pine orange</span>
+<p>This single choice decides whether it reads as considered or as a hardware-store
+shelf. Oil and oil-based varnish amber pine badly and blotch it. Use a <b>water-based
+clear</b>, a white or liming wax, or the traditional soap or lye finish that keeps
+nordic pine pale.</p></div>
+<p>If it sits on a closet floor, put a couple of thin strips underneath to keep it off
+the deck &mdash; dust and damp both find end grain first.</p>"""))
+    else:
+        steps.append(step(12, "Base, then finish", f"""
 {figure(base, "The legs spring straight off the underside on angled steel plates. No blocks &mdash; the bottom rail is 3/4&Prime; stock, so a bored tenon would break through it.")}
 <ul class="tight">
-<li>Glue a <b>3/4 &times; 1-1/2 cleat</b> along the front and back edges of the bottom cell
-floor, inside. It doubles the screw purchase and is invisible from outside.</li>
+<li>Glue a <b>3/4 &times; 1-1/2 cleat</b> along the front and back edges of the bottom
+cell floor, inside. It doubles the screw purchase and is invisible from outside.</li>
 <li>Screw the plates to the underside, set in 3/8&Prime; from the edges, each rotated
 <b>45&deg; in plan</b> so its angle leans out toward the nearest corner.</li>
 <li>Screw in the legs. If it rocks, trim the long foot <b>flat and parallel to the
@@ -611,34 +987,89 @@ varnish, two or three thin coats.</li>
 </ul>
 <p>Cherry keeps darkening for about a year. That's normal, and it's the good part.</p>"""))
 
+    BLURB = (f"""<p>Ten cells sized so letter and A4 sit flat with the long edge
+left to right &mdash; which is the trick that lets {frac(DEPTH)}&Prime; boards hold
+11&Prime; paper. The five shelves are housed into the stiles, the interior grid is a
+half-lapped egg crate, and the end rails land in a rabbet.</p>
+<p>It is the same joinery as the walnut wine rack at a different scale, which is exactly
+why it is the right thing to build first.</p>""" if DOCS else """<p>The five shelves are
+housed into the stiles. The interior grid is a half-lapped egg crate &mdash; one
+continuous divider notched into the shelves where they cross. At the top and bottom the
+rails land in a rabbet, so the outside of the case shows nothing but two continuous
+vertical lines.</p>""")
+
+    LEGS_SECTION = "" if DOCS else f"""<section class="step" style="border-top-width:2px">
+<div class="num-badge" style="color:var(--brass);background:transparent;border:1px solid var(--brass)">ALT</div>
+<div class="step-body">
+<h2>Variant &mdash; the Scandinavian legs</h2>
+<p>The mid-century version uses bought splayed legs on angled plates. The
+Scandinavian version uses square tapered legs you make yourself, standing plumb,
+held by glue blocks &mdash; <b>no bought hardware at all</b>. It is also the cheaper
+first build, which is why it makes a good rehearsal.</p>
+{figure(spine, "The same rack in pine with square tapered legs. Plumb stance, no ferrules, no plates.")}
+
+<h3>Stock</h3>
+<p>A nominal <b>2&times;2 is actually 1-1/2&Prime; square</b> &mdash; exactly the leg
+section, so no glue-up. One short length covers all four legs plus spares. Pick
+it carefully: construction 2&times;2 is often twisted and knotty, and a leg that
+isn't straight is obvious in a way a shelf isn't.</p>
+
+<h3>Cut the taper on the two INNER faces only</h3>
+{figure(svg_scandi_leg(), "The outer faces stay plumb and carry the line of the case sides down to the floor. Only the two faces looking into the case are tapered. All four legs are the same part, just rotated into their corners.", raster=False)}
+<div class="callout" style="border-left-color:var(--brass)">
+<span class="k" style="color:var(--brass)">Leave the top {frac(SQ_POST)}&Prime; square</span>
+<p>The taper starts below a square post. That is not decoration &mdash; the glue
+blocks need a flat parallel face to sit against. Taper from the very top and the
+blocks meet a sloping face and leave a wedge-shaped gap.</p></div>
+
+<p><b>How to cut it.</b> Two options, and for four short pine legs I would take
+the second:</p>
+<ul class="tight">
+<li><b>Table saw with a tapering jig</b> &mdash; a board with a stop that holds the
+leg at an angle to the fence. Cut one face, rotate 90&deg;, cut the next. After
+the first cut that face is no longer square, so the jig must ride on the faces
+you haven't cut yet.</li>
+<li><b>Saw close and plane to the line.</b> Mark the taper on both faces, saw
+just outside it, then plane down. Removing 5/8&Prime; over 10&Prime; in pine is a
+few minutes per face, it needs no jig, and there is nothing to go wrong at
+speed.</li>
+</ul>
+<p>Ease every long edge lightly afterwards &mdash; a small chamfer or a couple of
+plane strokes. Pine dents if you look at it, and a crisp arris will not survive
+being moved around.</p>
+
+<h3>Fixing them on</h3>
+{figure(sbase, "Two glue blocks per leg, in the inner corner. Long grain to long grain against both the leg and the underside of the case, which is why this needs no hardware.")}
+<p>Glue and rub the blocks into place, then check the piece stands without
+rocking before the glue sets. If it rocks, trim the long foot <b>flat and
+parallel to the floor</b>.</p>
+</div></section>"""
+
     html = f"""<title>Wine Rack &mdash; Shop Build Guide</title>
 <style>{CSS}</style>
 <div class="wrap">
 <header class="top">
   <p class="eyebrow">Shop build guide</p>
-  <h1>Mid-century wine rack</h1>
-  <p class="lede">Twelve bottles in walnut or cherry, on splayed tapered legs.
-  Written for a table saw, router, mitre saw and hand tools &mdash; and for someone whose
-  last project was a picture frame.</p>
+  <h1>{P["title"]}</h1>
+  <p class="lede">{P["lede"]}</p>
   <ul class="specs">
     <li class="chip">Finished <b>{frac(W)} &times; {frac(DEPTH)} &times; {frac(OVERALL_H,8)} in</b></li>
-    <li class="chip">Openings <b>{frac(OPENING)} in square</b></li>
-    <li class="chip">Stock <b>3/4 in, {frac(DEPTH)} in wide</b></li>
-    <li class="chip">Material <b>~18 linear ft</b></li>
+    <li class="chip">Cells <b>{frac(OPENING_W)} &times; {frac(OPENING_H)} in</b></li>
+    <li class="chip">Stock <b>{P["stock"]}</b></li>
+    <li class="chip">Material <b>~{MATERIAL_FT:.0f} linear ft</b></li>
   </ul>
 </header>
 
 {figure(hero, "The piece as designed: stiles running full height, an egg-crate interior, and bought legs on angled plates.")}
 
 <h3>What it is</h3>
-<p>The five shelves are housed into the stiles. The interior grid is a half-lapped egg
-crate &mdash; one continuous divider notched into the shelves where they cross. At the top
-and bottom the rails land in a rabbet, so the outside of the case shows nothing but two
-continuous vertical lines.</p>
+{BLURB}
 
 {figure(svg_elevation(), "Front elevation. The case is 29-1/4&Prime;; the legs set the rest of the height, so buy them first.", raster=False)}
 
 {"".join(steps)}
+
+{LEGS_SECTION}
 
 <section class="step" style="border-top-width:2px">
 <div class="num-badge" style="color:var(--wine);background:transparent;border:1px solid var(--wine)">!</div>
@@ -667,7 +1098,7 @@ drawings can't drift apart.</p>
 </div>
 <script>{JS}</script>
 """
-    out = os.path.join(ROOT, "guide.html")
+    out = os.path.join(ROOT, "guide_documents.html" if DOCS else "guide.html")
     with open(out, "w") as f:
         f.write(html)
     print(f"wrote {out}  ({len(html)/1024:.0f} KB)")

@@ -40,7 +40,7 @@ then discover the yard only stocks 7-1/2".
 | Brass ferrules | 4, if not included with the legs |
 | #8 × 5/8" screws | 16 |
 | Wood glue with long open time | Titebond Extend or liquid hide glue |
-| Clamps | 4 × 36" minimum |
+| Clamps | **6 × 18"** (12" is the true minimum: 10-1/4 case + 1-1/2 of cauls). Plus a few small ones for holding jigs |
 | Sandpaper | 120, 180, 220 |
 | Finish | hardwax oil or wiping varnish |
 | Plywood scrap | for jigs |

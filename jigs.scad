@@ -171,6 +171,38 @@ module work_slot(len, wid, slot_x, depth) {
     }
 }
 
+
+// ---------------------------------------------------------------
+//  Table saw scenes.  Only what reads: a table, a fence, and a blade
+//  standing proud of the surface.
+// ---------------------------------------------------------------
+TABLE   = "#8a8d91";
+FENCE_C = "#5f646a";
+
+module saw_table(x0, x1, y0, y1) {
+    color(TABLE) translate([x0, y0, -1.1]) cube([x1 - x0, y1 - y0, 1.1]);
+}
+
+// blade standing in the plane y = ypos, cutting along x
+module blade_along_x(xc, ypos, dia = 10, proj = 1.6) {
+    color(STEEL) translate([xc, ypos, proj - dia/2])
+        rotate([90, 0, 0]) cylinder(h = 0.11, d = dia, center = true, $fn = 64);
+}
+
+// blade standing in the plane x = xpos, cutting across y
+module blade_along_y(xpos, yc, dia = 10, proj = 1.6) {
+    color(STEEL) translate([xpos, yc, proj - dia/2])
+        rotate([90, 0, 90]) cylinder(h = 0.11, d = dia, center = true, $fn = 64);
+}
+
+// a board with one wavy edge -- the reason straight-line ripping exists
+module rough_board(len, wid, thick, wave = 0.42) {
+    pts = [for (i = [0 : 12])
+             [len * i / 12, wave * (sin(i * 74) + 0.7 * sin(i * 131)) ]];
+    linear_extrude(height = thick)
+        polygon(concat(pts, [[len, wid], [0, wid]]));
+}
+
 // =============================================================
 scale(UNIT) {
 if (JIG == "dado" || JIG == "dado_pass2") {
@@ -219,6 +251,34 @@ if (JIG == "dado" || JIG == "dado_pass2") {
         bench();
         bearing_assembly();
     }
+
+} else if (JIG == "ripsled") {
+    // One edge is straight because the SLED is straight; the blade then makes
+    // the second edge parallel to it.  Nothing references the rough edge.
+    FY = 7.0;                      // fence face
+    saw_table(-8, 34, -12, 12);
+    color(FENCE_C) translate([-8, FY, 0]) cube([42, 1.6, 3.0]);
+    color(PLYWOOD) translate([1, -1.5, 0]) cube([26, FY + 1.5, PLY]);
+    color(WALNUT) translate([1, -1.2, PLY]) rough_board(26, 6.0, T);
+    blade_along_x(14, 0, 10, T + PLY + 0.9);
+    color(STOP) for (x = [5, 20]) translate([x, 2.0, PLY + T])
+        cube([1.6, 1.6, 0.5]);     // screws or double-stick tape
+
+} else if (JIG == "stopblock") {
+    // The stop is what makes seven identical parts.  Measuring each one is how
+    // you get seven nearly-identical parts.
+    // shelf length, derived -- HORIZ_LEN is not a variable in the model,
+    // the horizontal extents are functions of the row index
+    L = hx1(1) - hx0(1);           // the part length being cut
+    saw_table(-L - 8, 14, -13, 6);
+    color(FENCE_C) translate([-L - 8, 0, 0]) cube([L + 22, 1.6, 2.6]);
+    // the part: between the stop and the blade
+    color(WALNUT) translate([-L, -DEPTH, 0]) cube([L, DEPTH, T]);
+    // the rest of the board, still to be cut, on the far side of the blade
+    color(WALNUT) translate([0.09, -DEPTH, 0]) cube([12, DEPTH, T]);
+    // stop block projects FROM the fence face, so the board end butts it
+    color(STOP) translate([-L - 1.6, -2.4, 0]) cube([1.6, 2.4, 2.4]);
+    blade_along_y(0, -DEPTH/2, 10, T + 1.1);
 
 } else if (JIG == "slot") {
     L = 9.25; WID = DEPTH; SX = 4.25; CUT = 2.5;   // caught mid-cut

@@ -115,8 +115,9 @@ Confirm the screw length against the actual plate thickness once chosen.
 |---|---|---|
 | **Pattern bit** (top-bearing straight bit) | **1/2" diameter**, bearing OD **equal to** the cutter OD, cutting length ~1", shank to match the router collet | For the 14 housings. The equal bearing makes the cut reproduce the template one-to-one, so the jig can be set with a piece of the actual shelf stock — no measuring |
 | Straight or spiral upcut bit | **1/2" diameter**, cutting length **≥ 1"** | For the 10 lap slots, which are through-cuts guided by a straightedge rather than a template. Not a 3/4" bit |
-| Clamps | **4 minimum, 36" capacity** — parallel, F-style, or pipe clamps | Genuinely needed, not optional |
-| Plywood scrap | 1/2", for shop-made jigs | Offcuts fine |
+| Clamps | **6, opening to 18"** — F-style bar or quick-grip trigger | The glue-up clamps across the case width: 10-1/4 plus 1-1/2 of cauls = 11-3/4 needed, so 12" is the hard minimum and tight. Six puts one at nearly every housing. Beware: some "12-inch" clamps quote bar length, not jaw opening |
+| Plywood scrap | 3/4" for the housing template, 1/2" for other jigs | Template thickness must roughly equal bit cutting length minus housing depth |
+| Cauls | two straight strips, ~1 × 1-1/2 × 12" | Scrap. Spreads clamp pressure across all seven housings and stops the pads embossing the wood |
 
 **Template stock:** 3/4" plywood or MDF for the housing jig. The thickness has to
 roughly equal (bit cutting length − housing depth) so the bearing rides on the
