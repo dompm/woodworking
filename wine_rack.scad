@@ -1,5 +1,5 @@
 // =============================================================
-//  Mid-century wine rack  -  12 bottle, 2 x 6
+//  A parametric cell-grid case, in two guises
 //  Walnut, 4/4 stock planed to 3/4", 9" wide boards
 //  Shelves housed into the stiles, interior grid half lapped (egg crate)
 //  Legs: 4 splayed round tapered legs on angled plates, brass ferrules
@@ -12,10 +12,20 @@
 
 UNIT = 25.4;   // 25.4 -> emit millimetres (recommended).  1 -> emit inches.
 
+// ---------------- which piece ----------------
+// The carcass is a parametric grid of cells.  Square cells on legs give the
+// wine rack; wide shallow cells sitting on the floor give a document unit.
+// Every joint is identical between them -- only the cell proportions change.
+//
+//   "winerack"   12 bottles, 4" square cells, splayed or square legs
+//   "documents"  letter and A4 laid flat, 12 x 3-1/2 cells, no legs
+PIECE = "winerack";
+DOCS  = (PIECE == "documents");
+
 // ---------------- what to draw ----------------
 mode         = "assembled";  // assembled | exploded | carcass | joint | parts
-show_bottles = true;
-show_legs    = true;
+show_bottles = !DOCS;
+show_legs    = !DOCS;
 
 // ---------------- corner joint ----------------
 // The five shelves are always housed into the stiles.  This picks who wins
@@ -52,9 +62,14 @@ DADO     = 0.25;    // shelf / rail into stile, 1/3 of stock
 DADO_DIV = 0.1875;
 
 // ---------------- grid ----------------
-OPENING = 4.00;  // clear opening, square
+// Clear opening of one cell.  The carcass is really just a parametric cell
+// grid -- square cells give the wine rack, wide flat cells give a document
+// unit, and every joint stays identical.
+OPENING   = 4.00;                        // convenience: square cells
+OPENING_W = DOCS ? 12.00 : OPENING;      // clear opening, left to right
+OPENING_H = DOCS ?  3.50 : OPENING;      // clear opening, top to bottom
 COLS    = 2;
-ROWS    = 6;
+ROWS    = DOCS ? 5 : 6;
 
 // ---------------- legs ----------------
 // The legs are the bought part, so they are an INPUT and the overall height
@@ -95,6 +110,10 @@ LEG_STYLE = "round";
 SQ_TOP   = 1.50;    // square leg, across the flats at the top
 SQ_BOT   = 0.875;   // at the foot
 SQ_INSET = 0.125;   // reveal between the leg's outer faces and the case sides
+// The top of the leg stays full square before the taper starts, so the glue
+// blocks have a flat parallel face to sit against.  Taper from the very top and
+// the blocks meet a sloping face and leave a wedge-shaped gap.
+SQ_STRAIGHT = 1.50;
 GB_XY    = 1.00;    // glue blocks in the inner corner
 GB_H     = 1.25;
 
@@ -108,8 +127,8 @@ BLOCK_H     = 1.50;
 MOUNT_INSET = 0.375;  // set in from the carcass edges so it sits in shadow
 
 // ---------------- derived ----------------
-W = COLS*OPENING + (COLS+1)*T;          // 10.25
-H = ROWS*OPENING + (ROWS+1)*T;          // 29.25
+W = COLS*OPENING_W + (COLS+1)*T;        // 10.25 as a wine rack
+H = ROWS*OPENING_H + (ROWS+1)*T;        // 29.25 as a wine rack
 
 SQUARE   = (LEG_STYLE == "square");
 PLATED   = (LEG_MOUNT == "plate") && !SQUARE;
@@ -131,11 +150,11 @@ OVERALL_H = H + LEG_RISE;                     // derived, not chosen
 
 // z of the bottom face of horizontal member j.  j = 0 is the bottom rail,
 // j = ROWS is the top rail, everything between is a shelf.
-function hz(j)    = j * (OPENING + T);
+function hz(j)    = j * (OPENING_H + T);
 // z of the bottom of the clear opening of row j
 function row_z(j) = hz(j) + T;
 // x of the left face of vertical divider i
-function div_x(i) = (i + 1) * (OPENING + T);
+function div_x(i) = (i + 1) * (OPENING_W + T);
 
 RAILS_THROUGH = (END_JOINT == "rails_through");
 EGG           = (GRID == "eggcrate");
@@ -248,7 +267,7 @@ module horizontal(j) {
 // short vertical divider inside one row, for GRID = "housed"
 module divider(j, i) {
     translate([div_x(i), 0, row_z(j) - DADO_DIV])
-        cube([T, DEPTH, OPENING + 2*DADO_DIV]);
+        cube([T, DEPTH, OPENING_H + 2*DADO_DIV]);
 }
 
 // one continuous divider for GRID = "eggcrate", notched at every crossing
@@ -370,10 +389,17 @@ function leg_yo(sy) = (sy < 0) ? SQ_INSET : DEPTH - SQ_INSET;
 module leg_square(sx, sy) {
     dx = (sx < 0) ? 1 : -1;
     dy = (sy < 0) ? 1 : -1;
-    color(WALNUT) hull() {
-        // runs 0.02 up into the case rather than stopping flush on its face
-        translate([leg_xo(sx), leg_yo(sy), -0.02]) corner_slab(SQ_TOP, dx, dy, 0.04);
-        translate([leg_xo(sx), leg_yo(sy), -LEG_LENGTH]) corner_slab(SQ_BOT, dx, dy, 0.02);
+    color(WALNUT) union() {
+        // square post at the top -- runs 0.02 up into the case rather than
+        // stopping flush on its face
+        translate([leg_xo(sx), leg_yo(sy), -SQ_STRAIGHT])
+            corner_slab(SQ_TOP, dx, dy, SQ_STRAIGHT + 0.02);
+        hull() {
+            translate([leg_xo(sx), leg_yo(sy), -SQ_STRAIGHT])
+                corner_slab(SQ_TOP, dx, dy, 0.02);
+            translate([leg_xo(sx), leg_yo(sy), -LEG_LENGTH])
+                corner_slab(SQ_BOT, dx, dy, 0.02);
+        }
     }
 }
 
@@ -453,7 +479,7 @@ module bottle() {
 
 // lying on its side, base near the back of the cell, neck out the front
 module bottle_in_cell(j, i) {
-    cx = T + i*(OPENING + T) + OPENING/2;
+    cx = T + i*(OPENING_W + T) + OPENING_W/2;
     cz = row_z(j) + 1.55;   // resting on the shelf, 3" dia
     translate([cx, DEPTH - 0.25, cz]) rotate([90, 0, 0]) bottle();
 }
@@ -549,6 +575,8 @@ scale(UNIT) {
 
 echo(str("end joint           = ", END_JOINT));
 echo(str("carcass W x H x D   = ", W, " x ", H, " x ", DEPTH));
+echo(str("cell (w x h)        = ", OPENING_W, " x ", OPENING_H,
+         "   grid ", COLS, " x ", ROWS, " = ", COLS*ROWS, " cells"));
 echo(str("overall height      = ", H + LEG_RISE));
 echo(str("stile length        = ", STILE_Z1 - STILE_Z0, " x2"));
 echo(str("end rail length     = ", hx1(0) - hx0(0), " x2"));
@@ -557,7 +585,7 @@ echo(str("grid                = ", GRID));
 echo(EGG
      ? str("divider length      = ", hz(ROWS) + DADO_DIV - (row_z(0) - DADO_DIV),
            " x", COLS - 1, "  (notched ", LAP_Y, " deep at ", ROWS - 1, " crossings)")
-     : str("divider length      = ", OPENING + 2*DADO_DIV, " x", ROWS * (COLS - 1)));
+     : str("divider length      = ", OPENING_H + 2*DADO_DIV, " x", ROWS * (COLS - 1)));
 echo(str("leg style           = ", LEG_STYLE,
          SQUARE ? "  (made: square, tapered inner faces, plumb)"
                 : str("  (bought: ", LEG_MOUNT, " mount, ", LEG_TILT_SPEC, " deg splay)")));

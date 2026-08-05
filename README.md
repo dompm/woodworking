@@ -33,6 +33,28 @@ position.
 Also: **[SOURCING.md](SOURCING.md)** — a self-contained brief for buying the
 materials.
 
+## Also in this repo: a coffee table
+
+A second, unrelated piece — 48" × 21" × 15" in solid walnut. One floating
+plane: a soft-edged slab undercut to a 7/16" arris over a base recessed
+2-5/8 to 3-1/2 inches inside its outline. Four legs splayed 8&deg; toward the
+corner, chamfered and tapered. All the joinery is hidden — shopmade loose
+tenons, which is also the only sane way to cut a joint against a
+compound-splayed leg.
+
+**[COFFEE_TABLE.md](COFFEE_TABLE.md)** — the design rationale, the cut list, the
+wood-movement and cupping strategy, and an honest list of what the build
+demands.
+
+| | |
+|---|---|
+| `coffee_table.scad` | the model |
+| `export_table_parts.scad` | one STL per board, for the renderer |
+| `render_table.sh` / `render_table_beauty.sh` | drawings, then Cycles |
+
+`blender/scene.py` renders both pieces: `--model winerack` (the default, with
+the numbers it always had) or `--model table`.
+
 ## Two builds from one model
 
 | | Mid-century (walnut) | Scandinavian (pine) |
