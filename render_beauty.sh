@@ -26,12 +26,34 @@ ex brass brass 0
 ex steel steel 0
 ex bottles bottles 0
 
+# The scandinavian variant is a different part set: square legs, glue blocks,
+# no brass or steel.
+echo "exporting scandi parts"
+mkdir -p exports/parts_scandi
+sx() {
+  openscad -o "exports/parts_scandi/$1.stl" -D 'mode="none"' \
+           -D "PART=\"$2\"" -D "PART_I=$3" \
+           -D 'LEG_STYLE="square"' -D DEPTH=9.25 export_parts.scad >/dev/null 2>&1
+}
+for i in 0 1; do sx "stile$i" stile $i; done
+for i in 0 1 2 3 4 5 6; do sx "horiz$i" horiz $i; done
+sx divider divider 0
+for i in 0 1 2 3; do sx "leg$i" leg $i; done
+sx blocks blocks 0
+sx bottles bottles 0
+
 for wood in walnut cherry; do
   echo "rendering $wood"
   "$BLENDER" -b -P blender/scene.py -- \
     --wood "$wood" --view hero --samples "$SAMPLES" --res "$RES" \
     --out "renders/beauty_${wood}.png" 2>&1 | grep -E 'Saved|Error' || true
 done
+
+echo "rendering pine (scandinavian)"
+"$BLENDER" -b -P blender/scene.py -- \
+  --wood pine --parts exports/parts_scandi --view hero \
+  --samples "$SAMPLES" --res "$RES" \
+  --out renders/beauty_pine.png 2>&1 | grep -E 'Saved|Error' || true
 
 echo "rendering detail"
 "$BLENDER" -b -P blender/scene.py -- \
