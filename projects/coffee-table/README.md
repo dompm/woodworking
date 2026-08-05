@@ -6,15 +6,15 @@ arris, hovering over a base that is pulled 2-5/8 to 3-1/2 inches inside its
 outline on every side. Two slim rails, four splayed chamfered posts, a thin
 shelf. **No visible joinery anywhere.**
 
-![Coffee table](renders/table_beauty_walnut.png)
+![Coffee table](renders/beauty_walnut.png)
 
 | | |
 |---|---|
 | `coffee_table.scad` | the model, all dimensions in inches |
-| `export_table_parts.scad` | writes one STL per board, for the renderer |
-| `render_table.sh` | working drawings + meshes, via OpenSCAD (seconds) |
-| `render_table_beauty.sh` | photoreal shots, via Blender/Cycles (minutes) |
-| `renders/table_*.png` | three-quarter, elevations, exploded, edge and joint details |
+| `export_parts.scad` | writes one STL per board, for the renderer |
+| `render.sh` | working drawings + meshes, via OpenSCAD (seconds) |
+| `render_beauty.sh` | photoreal shots, via Blender/Cycles (minutes) |
+| `renders/` | three-quarter, elevations, exploded, edge and joint details |
 | `exports/coffee_table.stl` `.3mf` | the whole piece, in **millimetres** |
 
 ---
@@ -85,7 +85,7 @@ racking resistance is made of, and depth at mid-span is only carrying a shelf.
 
 The legs are splayed **8° total, toward the corner** — a real compound splay,
 5.66° on each axis, from the identity cos(a)·cos(a) = cos(tilt) that
-`wine_rack.scad` already uses. Nothing on a compound-splayed leg is square to
+`lib/casework.scad` already uses. Nothing on a compound-splayed leg is square to
 anything. An integral tenon means holding the leg at a compound angle to cut a
 mortise *and* cutting a compound shoulder on the rail, and getting both to
 agree.
@@ -147,7 +147,7 @@ move about 0.018", which is inside the glue line.
    screwed through round holes and locate the top along its length, where it
    does not move; the rest are in slots.
 
-   `renders/table_edge.png` is a section through exactly that. The white slot in
+   `renders/edge.png` is a section through exactly that. The white slot in
    the drawing is the gap, drawn at size.
 
 2. **The top's ends and its whole width are unconstrained.** With no end rails
@@ -301,9 +301,9 @@ perfectly because there is nothing to hide behind."
 ## Reproducing the drawings
 
 ```sh
-./render_table.sh          # every OpenSCAD view + coffee_table.stl / .3mf
-./render_table_beauty.sh   # per-part STLs + three Cycles renders in walnut
-SAMPLES=800 RES=2600x1700 ./render_table_beauty.sh
+./render.sh          # every OpenSCAD view + coffee_table.stl / .3mf
+./render_beauty.sh   # per-part STLs + three Cycles renders in walnut
+SAMPLES=800 RES=2600x1700 ./render_beauty.sh
 ```
 
 ```sh
@@ -320,16 +320,16 @@ openscad -D LEG_TILT=12 -D LEN=54 coffee_table.scad   # everything follows
 
 | | |
 |---|---|
-| `table_hero.png` | three-quarter |
-| `table_persp_end.png` | three-quarter from the open end |
-| `table_front.png` / `table_side.png` | orthographic elevations |
-| `table_top.png` | the plan — the bow and the eased corners |
-| `table_edge.png` | **section through the top's edge**: the arris, the undercut, the recess, and a button with its travel gap |
-| `table_joint.png` | leg, both rails and all three loose tenons drawn apart |
-| `table_exploded.png` | every part along the axis it assembles on |
-| `table_base.png` | the base without the top |
-| `table_parts.png` | every unique part |
-| `table_beauty_*.png` | Cycles, walnut |
+| `hero.png` | three-quarter |
+| `persp_end.png` | three-quarter from the open end |
+| `front.png` / `side.png` | orthographic elevations |
+| `top.png` | the plan — the bow and the eased corners |
+| `edge.png` | **section through the top's edge**: the arris, the undercut, the recess, and a button with its travel gap |
+| `joint.png` | leg, both rails and all three loose tenons drawn apart |
+| `exploded.png` | every part along the axis it assembles on |
+| `base.png` | the base without the top |
+| `parts.png` | every unique part |
+| `beauty_*.png` | Cycles, walnut |
 
 ### Two traps worth writing down
 
@@ -344,7 +344,7 @@ openscad -D LEG_TILT=12 -D LEN=54 coffee_table.scad   # everything follows
 
 ### The wood shader
 
-`blender/scene.py` renders both pieces in this repo. The pith-based ring scale
+`lib/scene.py` renders both pieces in this repo. The pith-based ring scale
 was tuned for the wine rack's 9"-wide boards; on a 21" top at that pitch it
 reads as corduroy, and on a 1-5/8" leg it aliases into a herringbone. There is
 now a `--rings` multiplier (default **1.0**, so the wine rack is untouched) and
@@ -359,6 +359,6 @@ with a mean absolute difference of 0.001/255 from the committed
 ### Units
 
 Design math is in inches, scaled by `UNIT = 25.4` on output, so the emitted
-scene is millimetres — same reasoning as `wine_rack.scad`. The mesh is manifold
+scene is millimetres — same reasoning as `lib/casework.scad`. The mesh is manifold
 (`Simple: yes`, no 2-manifold warning); the volume count is the assembly plus
 the twelve loose tenons, which float with clearance inside their mortises.

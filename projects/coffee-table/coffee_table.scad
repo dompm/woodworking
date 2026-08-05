@@ -16,7 +16,7 @@
 //  ALL DESIGN MATH IS IN INCHES.  The model is scaled by UNIT on output so the
 //  scene OpenSCAD draws is in millimetres -- a 15" object is 15 units tall,
 //  which sits inside OpenSCAD's near clip plane and makes the viewport
-//  unusable.  Same reasoning as wine_rack.scad.
+//  unusable.  Same reasoning as lib/casework.scad.
 // =============================================================
 
 UNIT = 25.4;   // 25.4 -> emit millimetres (recommended).  1 -> emit inches.
@@ -67,7 +67,7 @@ LEG_CHAM = 0.125;   // chamfer on all four arrises, at the top; it tapers with
 
 // Total lean off plumb, toward the corner -- a genuine compound splay, not a
 // lean in one plane.  Written the way angled leg hardware is sold and the way
-// wine_rack.scad already writes it: ONE number for the total tilt, with the
+// lib/casework.scad already writes it: ONE number for the total tilt, with the
 // per-axis angle derived, because cos(a)*cos(a) == cos(tilt).
 LEG_TILT = 8;
 

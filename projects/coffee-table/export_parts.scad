@@ -5,7 +5,7 @@
 // model does not also draw the whole table:
 //
 //   openscad -o out.stl -D 'mode="none"' \
-//            -D 'PART="leg"' -D 'PART_I=0' export_table_parts.scad
+//            -D 'PART="leg"' -D 'PART_I=0' export_parts.scad
 //
 // PART is one of: top | rail | xrail | leg | shelf | tenons | buttons
 

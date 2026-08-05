@@ -1,16 +1,23 @@
 """
 Beauty render of a piece from this repo.
 
-Imports the per-part STLs written by export_parts.scad (wine rack) or
-export_table_parts.scad (coffee table), builds a procedural wood shader (no
-external texture files), lights a small studio set and renders with Cycles.
+Imports the per-part STLs written by lib/export_casework.scad (wine rack,
+document unit) or projects/coffee-table/export_parts.scad, builds a procedural
+wood shader (no external texture files), lights a small studio set and renders
+with Cycles.
 
-    /Applications/Blender.app/Contents/MacOS/Blender -b -P blender/scene.py -- \
-        --wood walnut --out renders/beauty_walnut.png --samples 256
+--parts and --out are relative to the repo root, so a project's render_beauty.sh
+points them inside its own directory.  Normally you would run that script rather
+than calling this directly.
 
-    /Applications/Blender.app/Contents/MacOS/Blender -b -P blender/scene.py -- \
-        --model table --parts exports/table_parts --view table \
-        --res 2000x1300 --out renders/table_beauty_walnut.png
+    /Applications/Blender.app/Contents/MacOS/Blender -b -P lib/scene.py -- \
+        --parts projects/wine-rack/exports/parts --wood walnut \
+        --out projects/wine-rack/renders/beauty_walnut.png --samples 256
+
+    /Applications/Blender.app/Contents/MacOS/Blender -b -P lib/scene.py -- \
+        --model table --parts projects/coffee-table/exports/parts \
+        --view table --res 2000x1300 \
+        --out projects/coffee-table/renders/beauty_walnut.png
 
 Grain runs along each board's own long axis, so there is one material per axis.
 The wine rack needs two: every carcass part has its 9" dimension front to back,
@@ -36,10 +43,10 @@ from mathutils import Vector
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 ap = argparse.ArgumentParser()
 ap.add_argument("--wood", default="walnut", choices=["walnut", "cherry", "pine"])
-ap.add_argument("--out", default="renders/beauty.png")
+ap.add_argument("--out", default="projects/wine-rack/renders/beauty.png")
 ap.add_argument("--samples", type=int, default=256)
 ap.add_argument("--res", default="1400x1900")
-ap.add_argument("--parts", default="exports/parts")
+ap.add_argument("--parts", default="projects/wine-rack/exports/parts")
 ap.add_argument("--view", default="hero",
                 choices=["hero", "front", "detail", "wide",
                          "table", "table_end", "table_detail"])

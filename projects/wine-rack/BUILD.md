@@ -10,7 +10,7 @@ Read [CUTLIST.md](CUTLIST.md) alongside this — it has every dimension. This
 document is the order to do things in and the technique for each step.
 
 Numbers below assume `DEPTH = 9"`. If your boards come narrower, set `DEPTH` in
-`wine_rack.scad` to what you actually got and re-read the cut list; only the
+`lib/casework.scad` to what you actually got and re-read the cut list; only the
 depth-related numbers change.
 
 ---

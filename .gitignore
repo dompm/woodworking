@@ -1,10 +1,7 @@
 # Per-part meshes: intermediates for the Blender pipeline, regenerated in
-# seconds by render_beauty.sh / render_table_beauty.sh.  They are large and
-# they churn on every run.
-exports/parts/
-exports/parts_scandi/
-exports/parts_doc/
-exports/table_parts/
+# minutes by any project's render_beauty.sh.  Large, and they churn every run.
+projects/*/exports/parts/
+projects/*/exports/parts_*/
 
 .DS_Store
 __pycache__/

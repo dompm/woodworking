@@ -7,11 +7,15 @@ OpenSCAD model uses, so the guide can't drift from the design. Renders are
 downscaled and inlined as data URIs -- the published page has to be
 self-contained.
 
-    python3 make_guide.py             ->  guide.html            (wine rack)
-    python3 make_guide.py documents   ->  guide_documents.html  (document unit)
+    python3 lib/guide.py             ->  projects/wine-rack/guide.html
+    python3 lib/guide.py documents   ->  projects/document-unit/guide.html
 
 Both pieces come out of one OpenSCAD model, so they come out of one generator
-too -- the joinery is identical and only the cell proportions differ.
+too -- the joinery is identical and only the cell proportions differ.  For the
+same reason both guides share illustrations: the jig drawings live under lib/,
+and the joinery renders live with the wine rack because that is where they were
+made, not because they only apply there.  img() searches for a name across all
+of those directories rather than encoding which piece owns which picture.
 """
 import base64
 import io
@@ -22,7 +26,7 @@ from fractions import Fraction
 
 from PIL import Image
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ---------------------------------------------------------------- which piece
 PIECE = sys.argv[1] if len(sys.argv) > 1 else "winerack"
@@ -46,6 +50,19 @@ if PIECE not in PIECES:
     raise SystemExit("piece must be one of: " + ", ".join(PIECES))
 P = PIECES[PIECE]
 DOCS = (PIECE == "documents")
+PROJECT = "document-unit" if DOCS else "wine-rack"
+
+# Where img() looks, in order.  Both guides share illustrations, and now that
+# each project owns its renders/ the short names collide on purpose --
+# exploded.png exists for both pieces.  So: this piece first, then the wine rack
+# as the fallback (the joinery drawings were all made there), then lib for the
+# jigs.  The coffee table is deliberately absent; nothing here cites it, and
+# leaving it out keeps its beauty_walnut.png from shadowing the rack's.
+IMG_ROOTS = [
+    "projects/%s/renders" % PROJECT,
+    "projects/wine-rack/renders",
+    "lib/renders",
+]
 
 # ---------------------------------------------------------------- model facts
 T          = 0.75
@@ -95,9 +112,26 @@ def frac(x, denom=16):
 
 
 # ---------------------------------------------------------------- images
+def find_img(rel):
+    """Resolve "renders/jigs/dado.png" against every project's renders/ dir.
+
+    Fails loudly.  A missing illustration used to sail through as a broken
+    <img> in the published page, which is exactly the sort of thing nobody
+    notices until they are standing at the bench.
+    """
+    tail = rel[len("renders/"):] if rel.startswith("renders/") else rel
+    for root in IMG_ROOTS:
+        path = os.path.join(ROOT, root, tail)
+        if os.path.exists(path):
+            return path
+    raise SystemExit(
+        "guide: no such render %r -- looked in %s"
+        % (tail, ", ".join(IMG_ROOTS))
+    )
+
+
 def img(rel, width=900, quality=78):
-    path = os.path.join(ROOT, rel)
-    im = Image.open(path).convert("RGB")
+    im = Image.open(find_img(rel)).convert("RGB")
     if im.width > width:
         im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
     buf = io.BytesIO()
@@ -1045,7 +1079,9 @@ rocking before the glue sets. If it rocks, trim the long foot <b>flat and
 parallel to the floor</b>.</p>
 </div></section>"""
 
-    html = f"""<title>Wine Rack &mdash; Shop Build Guide</title>
+    # Has to follow the piece: this is the browser tab, and it is the name the
+    # published page carries around.  Both guides went out called "Wine Rack".
+    html = f"""<title>{P["title"]} &mdash; Shop Build Guide</title>
 <style>{CSS}</style>
 <div class="wrap">
 <header class="top">
@@ -1098,7 +1134,7 @@ drawings can't drift apart.</p>
 </div>
 <script>{JS}</script>
 """
-    out = os.path.join(ROOT, "guide_documents.html" if DOCS else "guide.html")
+    out = os.path.join(ROOT, "projects", PROJECT, "guide.html")
     with open(out, "w") as f:
         f.write(html)
     print(f"wrote {out}  ({len(html)/1024:.0f} KB)")

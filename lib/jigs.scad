@@ -9,7 +9,7 @@
 //  Everything sits on a bench at z = 0 and is in inches, like the model.
 // =============================================================
 
-include <wine_rack.scad>
+include <casework.scad>
 
 JIG = "dado";
 

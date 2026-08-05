@@ -5,11 +5,11 @@
 // model does not also draw the whole assembly:
 //
 //   openscad -o out.stl -D 'mode="none"' \
-//            -D 'PART="stile"' -D 'PART_I=0' export_parts.scad
+//            -D 'PART="stile"' -D 'PART_I=0' lib/export_casework.scad
 //
 // PART is one of: stile | horiz | divider | leg | brass | steel | bottles
 
-include <wine_rack.scad>
+include <casework.scad>
 
 PART   = "stile";
 PART_I = 0;

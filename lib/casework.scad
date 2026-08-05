@@ -577,7 +577,10 @@ echo(str("end joint           = ", END_JOINT));
 echo(str("carcass W x H x D   = ", W, " x ", H, " x ", DEPTH));
 echo(str("cell (w x h)        = ", OPENING_W, " x ", OPENING_H,
          "   grid ", COLS, " x ", ROWS, " = ", COLS*ROWS, " cells"));
-echo(str("overall height      = ", H + LEG_RISE));
+// Only meaningful when there are legs.  The document unit sits on the floor,
+// and reporting a 32" overall height for a 22" case is how someone ends up
+// cutting to the wrong number.
+if (show_legs) echo(str("overall height      = ", H + LEG_RISE));
 echo(str("stile length        = ", STILE_Z1 - STILE_Z0, " x2"));
 echo(str("end rail length     = ", hx1(0) - hx0(0), " x2"));
 echo(str("shelf length        = ", hx1(1) - hx0(1), " x", ROWS - 1));
@@ -586,10 +589,15 @@ echo(EGG
      ? str("divider length      = ", hz(ROWS) + DADO_DIV - (row_z(0) - DADO_DIV),
            " x", COLS - 1, "  (notched ", LAP_Y, " deep at ", ROWS - 1, " crossings)")
      : str("divider length      = ", OPENING_H + 2*DADO_DIV, " x", ROWS * (COLS - 1)));
-echo(str("leg style           = ", LEG_STYLE,
-         SQUARE ? "  (made: square, tapered inner faces, plumb)"
-                : str("  (bought: ", LEG_MOUNT, " mount, ", LEG_TILT_SPEC, " deg splay)")));
-echo(str("leg length          = ", LEG_LENGTH));
-echo(SQUARE ? str("  -> section        = ", SQ_TOP, " sq tapering to ", SQ_BOT)
-            : str("  -> per-axis splay = ", LEG_SPLAY, " deg"));
-echo(str("  -> rise to case   = ", LEG_RISE));
+if (show_legs) {
+    echo(str("leg style           = ", LEG_STYLE,
+             SQUARE ? "  (made: square, tapered inner faces, plumb)"
+                    : str("  (bought: ", LEG_MOUNT, " mount, ",
+                          LEG_TILT_SPEC, " deg splay)")));
+    echo(str("leg length          = ", LEG_LENGTH));
+    echo(SQUARE ? str("  -> section        = ", SQ_TOP, " sq tapering to ", SQ_BOT)
+                : str("  -> per-axis splay = ", LEG_SPLAY, " deg"));
+    echo(str("  -> rise to case   = ", LEG_RISE));
+} else {
+    echo(str("overall height      = ", H, "  (no legs; sits on the floor)"));
+}
