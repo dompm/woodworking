@@ -7,8 +7,10 @@ generated from that model, so none of it can drift from the design.
 
 | | | |
 |---|---|---|
-| **[Document unit](projects/document-unit/)** | 10 cells for letter and A4 laid flat, in pine. 26-1/4 × 9-1/4 × 22. | **building first** · [guide](https://claude.ai/code/artifact/87fcd98c-7703-488a-8ec8-152ccdd2b3c9) |
+| **[Document unit](projects/document-unit/)** | 10 cells for letter and A4 laid flat, in pine. 26-1/4 × 11 × 22. | **building first** · [guide](https://claude.ai/code/artifact/87fcd98c-7703-488a-8ec8-152ccdd2b3c9) |
 | **[Wine rack](projects/wine-rack/)** | 12 bottles in walnut, on splayed tapered legs. 10-1/4 × 9 × 39-1/2. | the real one · [guide](https://claude.ai/code/artifact/a3f2afa2-34b5-4bcf-a35a-0f884b502578) |
+| **[Footrest](projects/footrest/)** | Solid ramp on splayed sides, felt inset. 17 × 10-7/16 × 6-1/4. | a brace, not a platform |
+| **[Salt boxes](projects/salt-boxes/)** | A pair in hardwood, swivelling lids. 3-1/4 sq. | MSG and sugar |
 | **[Coffee table](projects/coffee-table/)** | 48 × 21 × 15 in solid walnut, all joinery hidden. | someday |
 
 ![Walnut wine rack](projects/wine-rack/renders/beauty_walnut.png)
@@ -24,6 +26,8 @@ forgiving scale and in cheaper wood, and building it teaches the real piece.
 ```
 lib/         shared across every project
 projects/    one directory per piece
+TOOLS.md     what's in the shop, and what each tool takes in consumables
+SHOPPING.md  what still needs buying, with the specs that are easy to get wrong
 ```
 
 `lib/` is the part that gets reused. The wood shader, the jig models and the
