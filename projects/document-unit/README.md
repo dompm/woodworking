@@ -1,7 +1,7 @@
 # Document unit
 
 Ten cells for letter and A4 laid flat, in pine.
-**26-1/4" W × 9-1/4" D × 22" H**, sitting on the floor. Two columns × five rows
+**26-1/4" W × 11" D × 22" H**, sitting on the floor. Two columns × five rows
 of 12" × 3-1/2" openings.
 
 ![Document unit in pine](renders/beauty_documents.png)
@@ -23,18 +23,22 @@ appears here at least once.
 ```
 
 The model is [`lib/casework.scad`](../../lib/casework.scad) with
-`PIECE="documents"`. `DEPTH` is 9.25 because 1x10 pine comes 9-1/4" actual and
-there is no reason to give that away:
+`PIECE="documents"`. `DEPTH` is 11: a 1x12 is 11-1/4" actual and you rip both
+edges square, landing at 11. Not a 1x10 — a letter-size duo-tang is 9 to 9-1/2"
+wide, so 9-1/4" is too tight and the wide ones don't go in at all.
+
+**Measure what you actually rip to and set `DEPTH` to match.** The lap slots are
+exactly half of it, and it's the one dimension in this build with no tolerance.
 
 ```sh
-openscad -D 'PIECE="documents"' -D DEPTH=9.25 lib/casework.scad
+openscad -D 'PIECE="documents"' -D DEPTH=11 lib/casework.scad
 ```
 
 ## Cut list
 
-Everything is 3/4" pine at the board's full 9-1/4" width. All parts are cut
-along the board, so the 9-1/4 dimension runs front to back on every piece and
-the whole case moves as one.
+Everything is 3/4" pine, ripped to a common 11" width. All parts are cut along
+the board, so the 11" dimension runs front to back on every piece and the whole
+case moves as one — no cross-grain conflicts anywhere.
 
 | Part | Length | Qty |
 |---|---|---|
@@ -42,12 +46,12 @@ the whole case moves as one.
 | Horizontal (2 end rails + 4 shelves — identical blanks) | 25-1/4 | 6 |
 | Divider | 20-7/8 | 1 |
 
-**About 18 linear feet, so three 8-foot boards** with enough left over to lose
-one to a knot.
+**About 18 linear feet, so three 8-foot 1x12s** — buy four so you can lose one
+to a knot or a crooked edge.
 
 ### Where the cuts go
 
-**Stile** — six 1/4"-deep housings across the 9-1/4 width, measured to the
+**Stile** — six 1/4"-deep housings across the 11" width, measured to the
 *lower* edge of each, from the bottom end:
 
 ```
@@ -57,17 +61,17 @@ one to a knot.
 The ones at 0 and 21-1/4 run off the end, so they are rabbets rather than
 trenches. Same setup, same bit, no separate operation.
 
-**Horizontals** — one 3/4"-wide lap slot, 4-5/8" deep, cut in from the **back**
+**Horizontals** — one 3/4"-wide lap slot, 5-1/2" deep, cut in from the **back**
 edge, landing 12-1/4" to 13" from either end. Symmetrical, so it does not
 matter which way round the board goes.
 
-**Divider** — four matching slots, 4-5/8" deep, cut in from the **front** edge,
+**Divider** — four matching slots, 5-1/2" deep, cut in from the **front** edge,
 at 3-11/16, 7-15/16, 12-3/16 and 16-7/16 from the bottom end.
 
 The two sets of slots open on **opposite** edges. That is what makes the grid
 go together, and it also means the divider cannot drop in from above: the only
 motion that engages the laps is a slide along the depth axis, divider entering
-from the back and travelling 4-5/8" forward. Glue up in two stages.
+from the back and travelling 5-1/2" forward. Glue up in two stages.
 
 ## Views
 

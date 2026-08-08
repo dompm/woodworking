@@ -21,7 +21,7 @@ rm -f "$PARTS"/*.stl
 ex() {
   openscad -o "$PARTS/$1.stl" -D 'mode="none"' \
            -D "PART=\"$2\"" -D "PART_I=$3" \
-           -D 'PIECE="documents"' -D DEPTH=9.25 "$S" >/dev/null 2>&1
+           -D 'PIECE="documents"' -D DEPTH=11 "$S" >/dev/null 2>&1
 }
 for i in 0 1; do ex "stile$i" stile $i; done
 for i in 0 1 2 3 4 5; do ex "horiz$i" horiz $i; done

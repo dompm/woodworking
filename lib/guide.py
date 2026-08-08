@@ -38,12 +38,12 @@ PIECES = {
                            "hand tools &mdash; and for someone whose last project "
                            "was a picture frame.",
                       stock="4/4 walnut, 9 in wide", hero="renders/beauty_walnut.png"),
-    "documents": dict(open_w=12.0, open_h=3.5,  rows=5, depth=9.25, legs=False,
+    "documents": dict(open_w=12.0, open_h=3.5,  rows=5, depth=11.0, legs=False,
                       title="Document unit",
                       lede="Ten cells for letter and A4 laid flat, in pine. The same "
                            "joinery as the wine rack at a different scale &mdash; "
                            "which is what makes it the right piece to build first.",
-                      stock="1x10 pine, 9-1/4 in actual",
+                      stock="1x12 pine, ripped to 11 in",
                       hero="renders/beauty_documents.png"),
 }
 if PIECE not in PIECES:
@@ -363,6 +363,97 @@ def pack_boards():
             boards.append({"parts": [(name, ln)],
                            "free": BOARD_LEN - 2 * END_TRIM - ln - KERF})
     return boards
+
+
+def svg_rip():
+    """Ripping to width with a circular saw and a clamped straightedge.  Plan
+    view.  The straightedge goes on the KEEPER side -- put it on the waste side
+    of a 1/4-inch trim and there is nothing to clamp it to."""
+    S = 21.0
+    OFF = 1.5          # illustrative blade-to-shoe-edge offset
+    BL  = 24.0         # board length shown
+    BW  = DEPTH + 0.25 # board before the final rip
+    pad_l, pad_t, pad_b, pad_r = 30, 150, 106, 168
+    bw, bh = BL * S, BW * S
+    ww, hh = bw + pad_l + pad_r, bh + pad_t + pad_b
+    y0 = pad_t                      # top of board  = waste side
+    yref = pad_t + bh               # bottom        = straightened edge
+    ycut = yref - DEPTH * S         # where the blade runs
+    yse  = ycut + OFF * S           # straightedge face (below the cut)
+
+    o = [f'<svg viewBox="0 0 {ww:.0f} {hh:.0f}" class="dwg" role="img" '
+         f'aria-label="Ripping to width with a circular saw against a clamped '
+         f'straightedge">']
+    o.append(f'<rect class="wp" x="{pad_l}" y="{y0}" width="{bw:.1f}" height="{bh:.1f}"/>')
+
+    # waste strip above the cut
+    o.append(f'<rect class="cut" x="{pad_l}" y="{y0}" width="{bw:.1f}" '
+             f'height="{ycut-y0:.1f}"/>')
+    o.append(f'<text class="lbl" x="{pad_l+bw-4:.1f}" y="{ycut-7:.1f}" '
+             f'text-anchor="end">WASTE &#8212; a sixteenth or two</text>')
+
+    # saw shoe, riding the straightedge, mostly supported on the keeper
+    shoe_h = 5.6 * S
+    o.append(f'<rect x="{pad_l+bw*0.42:.1f}" y="{yse-shoe_h:.1f}" width="{7.2*S:.1f}" '
+             f'height="{shoe_h:.1f}" style="fill:var(--ink);fill-opacity:.07;'
+             f'stroke:var(--ink);stroke-opacity:.45;stroke-width:1;'
+             f'stroke-dasharray:4 3"/>')
+    o.append(f'<text class="lbl" x="{pad_l+bw*0.42+10:.1f}" y="{yse-shoe_h+15:.1f}">'
+             f'SAW SHOE &#8212; its edge slides along the straightedge</text>')
+
+    # the cut line
+    o.append(f'<line x1="{pad_l:.1f}" y1="{ycut:.1f}" x2="{pad_l+bw:.1f}" '
+             f'y2="{ycut:.1f}" style="stroke:var(--wine);stroke-width:2.2;'
+             f'stroke-dasharray:9 5"/>')
+    o.append(f'<text class="warn" x="{pad_l+8:.1f}" y="{ycut-7:.1f}">'
+             f'blade cuts here</text>')
+
+    # the straightedge
+    se_h = 11
+    o.append(f'<rect x="{pad_l-6:.1f}" y="{yse:.1f}" width="{bw+12:.1f}" '
+             f'height="{se_h}" style="fill:var(--brass);fill-opacity:.55;'
+             f'stroke:var(--ink);stroke-opacity:.5;stroke-width:1"/>')
+    o.append(f'<text class="lbl" x="{pad_l:.1f}" y="{yse+se_h+16:.1f}">'
+             f'STRAIGHTEDGE</text>')
+
+    # clamps at each end
+    for cx in (pad_l + 26, pad_l + bw - 46):
+        o.append(f'<rect x="{cx:.1f}" y="{yse-9:.1f}" width="20" height="{se_h+18}" '
+                 f'style="fill:var(--wine);fill-opacity:.85"/>')
+    o.append(f'<text class="lbl" x="{pad_l+26:.1f}" y="{yse-16:.1f}">CLAMP</text>')
+
+    # spacer sticks, reference edge -> straightedge
+    for sx in (pad_l + bw*0.30, pad_l + bw*0.70):
+        o.append(f'<rect x="{sx:.1f}" y="{yse+se_h:.1f}" width="14" '
+                 f'height="{yref-yse-se_h:.1f}" style="fill:none;'
+                 f'stroke:var(--ink);stroke-width:1.4;stroke-dasharray:5 3"/>')
+    o.append(f'<text class="lbl" x="{pad_l+bw/2:.1f}" y="{(yse+yref)/2:.1f}" '
+             f'text-anchor="middle">SPACER STICKS &#8212; one at each end, '
+             f'the same two on every board</text>')
+
+    # the reference edge
+    o.append(f'<line x1="{pad_l:.1f}" y1="{yref:.1f}" x2="{pad_l+bw:.1f}" '
+             f'y2="{yref:.1f}" style="stroke:var(--ink);stroke-width:3"/>')
+    o.append(f'<text class="lbl" x="{pad_l:.1f}" y="{yref+18:.1f}">'
+             f'REFERENCE EDGE &#8212; straightened first; everything measures from it</text>')
+
+    # dimensions on the right
+    dx = pad_l + bw + 8
+    o.append(f'<path class="arrow" d="M {dx-4} {yse:.1f} v {yref-yse:.1f}"/>')
+    o.append(f'<text class="dim" x="{dx:.1f}" y="{(yse+yref)/2+4:.1f}">'
+             f'spacer = width &#8722; offset</text>')
+    o.append(f'<path class="arrow" d="M {dx-4} {ycut:.1f} v {yse-ycut:.1f}"/>')
+    o.append(f'<text class="dim" x="{dx:.1f}" y="{(ycut+yse)/2+4:.1f}">offset</text>')
+
+    o.append(f'<text class="note" x="{pad_l}" y="{hh-42}">Offset = blade to the '
+             f'edge of the shoe. Measure it once on scrap and write it on the saw.</text>')
+    o.append(f'<text class="note" x="{pad_l}" y="{hh-26}">Straightedge on the '
+             f'KEEPER side: trimming a sixteenth leaves no waste to clamp to.</text>')
+    o.append(f'<text class="note" x="{pad_l}" y="{hh-10}">The straightedge is the '
+             f'4&#8243; MDF strip cut for the mitre saw fence &#8212; factory edge '
+             f'toward the saw.</text>')
+    o.append("</svg>")
+    return "\n".join(o)
 
 
 def svg_cutlayout():
@@ -791,10 +882,16 @@ def build():
 sellers ship flat 0&deg; ones by default.</p>
 <p><b>Ask what board width your yard actually stocks, surfaced.</b> Whatever you get
 becomes the case depth.</p>""" if P["legs"] else f"""
-<p><b>The board width becomes the case depth.</b> A nominal 1&times;10 is actually
-<b>{frac(DEPTH)}&Prime;</b>, not 10 &mdash; softwood is sold nominal. Everything below
-assumes that number; if yours differs, set <span class="mono">DEPTH</span> in the model
-and re-read the cut list.</p>
+<p><b>The board width becomes the case depth.</b> A nominal 1&times;12 is actually
+11-1/4&Prime; &mdash; softwood is sold nominal &mdash; and you rip both edges square,
+landing at <b>{frac(DEPTH)}&Prime;</b>. Everything below assumes that number.
+<b>Measure what you actually get</b> and set <span class="mono">DEPTH</span> in the
+model to match: the lap slots are exactly half of it, and that is the one dimension
+here with no tolerance.</p>
+<p>{frac(DEPTH)}&Prime; rather than a 1&times;10's 9-1/4 because a letter-size
+duo-tang is 9 to 9-1/2&Prime; wide. At 9-1/4 the wide ones do not go in at all, and
+the narrow ones have a quarter inch behind them &mdash; not enough to get a finger
+under. This leaves two inches of room to grab.</p>
 <p><b>Check {frac(W)}&Prime; against wherever this is going.</b> That width is not a
 style choice &mdash; it is two columns of letter-width cells and there is nothing to
 negotiate. Measure the closet before you buy wood.</p>
@@ -809,13 +906,56 @@ visible front and back edges of the case. So all your stock has to finish at exa
 the same width.</p></div>"""))
 
     steps.append(step(2, "Bring every board to one width", f"""
-<p>With no jointer: screw or tape each board to a straight strip of plywood, run the
-plywood against the table saw fence, and the blade gives you a dead-straight edge.
-Then flip that edge to the fence and rip every board to final width
-<b>at one fence setting</b>. Don't move the fence between boards.</p>
-{figure(rip, "Straight-line ripping. The board is fixed to a straight plywood sled and the SLED rides the fence &mdash; nothing references the rough edge. The blade then makes the second edge parallel to the first.")}
-<p>Check three of them with calipers. They must match. A board 1/64&Prime; narrow means a
-shelf sits proud at the front of the case permanently.</p>"""))
+<p>A 1&times;12 is 11-1/4&Prime; nominal-actual with slightly rounded edges from the
+moulder. Both of those have to go: the edges become the visible front and back of
+every part, and they are the datum the lap slots get measured from. You cannot measure
+{frac(LAP_DEPTH)}&Prime; reliably from a rounded edge.</p>
+
+<p><b>Rough-crosscut to length first.</b> This is what keeps the ripping manageable:
+break the boards down oversize on the mitre saw and the longest rip becomes about
+26&Prime;, not eight feet. A four-foot straightedge then covers every cut in the
+project and you never need a track.</p>
+
+<div class="callout"><span class="k">Your straightedge is already on the list</span>
+<p>The 4&Prime; MDF strip you cut for the mitre saw's auxiliary fence has a factory
+edge, which is straighter than anything you can make. It does both jobs.</p>
+<p><b>And the cut that frees it does not have to be straight.</b> The edge you will
+guide against is the panel's factory edge &mdash; the one you are <em>not</em>
+cutting. The sawn edge becomes the back of the strip, where nothing rides. So measure
+4&Prime; in from a long factory edge and cut it however you like: freehand, with the
+saw's rip fence against that same factory edge, or ask the yard to do it. You only
+need one straight strip to bootstrap the rest of the build.</p>
+<p><b>Measure your blade-to-shoe offset once</b> and write it on the saw. Every
+straightedge position is that far back from the cut line, and it never changes.</p>
+</div>
+
+<p><b>Straighten one edge of each board.</b> Clamp the guide so it takes off just
+enough to clean up &mdash; this edge only needs to be <em>straight</em>, not a
+particular width.</p>
+
+<p><b>Then rip every board to final width off that straight edge.</b> Here is the part
+that matters: with no fence, there is nothing enforcing that the boards match. So
+<b>cut two spacer sticks to (final width &minus; blade offset)</b> and use them, one
+at each end, to set the straightedge off the board's straight edge. Same two sticks on
+every board. Never a tape measure, never a pencil line.</p>
+
+<p><b>The straightedge goes on the keeper side, not the waste side.</b> You are only
+trimming a couple of sixteenths off, so there is nothing on the waste side to clamp
+to &mdash; and the saw needs the keeper under it or it tips into the cut.</p>
+
+{figure(svg_rip(), "Ripping to width. The straightedge is clamped on the side you are keeping; the saw's shoe slides along it and the blade runs the offset away from it. The two spacer sticks are what make every board come out the same &mdash; a table saw fence does that job for free, a circular saw does not.", raster=False)}
+
+<div class="callout"><span class="k">Good face down</span>
+<p>A circular saw's teeth exit through the <em>top</em> face, so any tearout lands on
+the side facing up at you. Cut with the better face down.</p></div>
+
+<p>Check three of them against each other when you are done. They must match. A board
+1/64&Prime; narrow means a shelf sits proud at the front of the case permanently
+&mdash; and it means its lap will not close.</p>
+
+<p><b>Whatever width you actually land on, that is the number the rest of this guide
+depends on.</b> Measure it and set <span class="mono">DEPTH</span> in the model to
+match. The lap slots are exactly half of it and there is no tolerance in that.</p>"""))
 
     steps.append(step(3, "Cut the parts to length", f"""
 <p>Mitre saw with a <b>stop block</b>, or a crosscut sled. Never measure each piece
@@ -823,8 +963,10 @@ individually.</p>
 {figure(stopb, "The stop block is what makes identical parts. Slide the board until it touches the stop, cut, repeat &mdash; the length is set by the setup, not by your pencil line.")}
 <div class="callout"><span class="k">Check your saw crosses {frac(DEPTH)}&Prime; first</span>
 <p>Every cut here is <em>across</em> the board's width. A <b>non-sliding</b> mitre saw
-tops out around 5-3/4&Prime; (10&Prime;) or 7-3/4&Prime; (12&Prime;) and will not reach.
-You need a <b>sliding</b> mitre saw, or a table saw crosscut sled.</p>
+tops out around 5-3/4&Prime; (10&Prime;) or 7-3/4&Prime; (12&Prime;) and will not reach
+&mdash; you need a <b>sliding</b> one. A 10&Prime; slider is typically rated 12&Prime;
+at 90&deg;, so {frac(DEPTH)}&Prime; goes through with room to spare, but check yours
+against a scrap before you cut a real board.</p>
 <p>Don't cut halfway and flip the board to meet in the middle. It works in general, but
 these are the parts that have to match each other, and any misalignment between the two
 passes leaves a step exactly at the joint line.</p></div>
@@ -941,9 +1083,11 @@ nearer edge of each slot. All {2*(ROWS-1)} are {frac(T)}&Prime; wide &times;
 {figure(js_, "The slot setup: straightedge for the router to follow, a stop block (red) that ends the cut at the right depth, and a sacrificial board underneath because these cuts go all the way through.")}
 <p>Three or four depth passes &mdash; don't try to hog {frac(T)}&Prime; of walnut in one go.
 Cut the slot a hair fat so the parts go together without forcing.</p>
-<div class="callout"><span class="k">Why not the table saw</span>
-<p>{frac(LAP_DEPTH)}&Prime; is past a 10&Prime; blade's reach, and stopping a crosscut mid-board
-leaves the blade's arc cutting far past your line on the underside.</p></div>"""))
+<div class="callout"><span class="k">Why not the mitre saw</span>
+<p>Tempting, since it crosses the board already &mdash; but a slot has to
+<em>stop</em> at {frac(LAP_DEPTH)}&Prime;, and a stopped cut on a round blade leaves a
+curved bottom that cuts far past your line on the underside. The lap needs a flat
+floor square to the face, which is a router cut.</p></div>"""))
 
     steps.append(step(9, "Housings for the divider ends", f"""
 <p>Only the top and bottom rails get these &mdash; the five shelves don't, because the lap
