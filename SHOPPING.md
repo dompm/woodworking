@@ -31,9 +31,12 @@ overhanging ends, never in the middle of a panel.
 
 ### Sheet goods
 
-- [ ] **3/4" MDF handy panel, 2 × 4 ft** — does the jig rails, the crossbar,
-      the mitre saw auxiliary fence and the stop blocks. One panel covers all
-      of it.
+- [ ] **3/4" MDF handy panel, 2 × 4 ft — ×2.** See [JIGS.md](JIGS.md) for the
+      cutting layout. Panel 1 is the saw guide, the mitre saw auxiliary fence
+      and the U-jig; panel 2 is the cutting station's base and rails. One panel
+      can't do both: the station's rails need a 28" gap to clear a 26" board
+      when ripping, and that plus the rails is wider than a single sheet gives
+      you once the guide is cut from it.
 - [ ] ~~Second panel for a sacrificial backer~~ — **not needed.** The mitre saw
       does the cutting to length, so the only router cuts that go through are
       the ten lap slots: a 3/4" × 5-1/2" window each. A 6" × 12" scrap under

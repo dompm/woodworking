@@ -27,6 +27,7 @@ forgiving scale and in cheaper wood, and building it teaches the real piece.
 lib/         shared across every project
 projects/    one directory per piece
 TOOLS.md     what's in the shop, and what each tool takes in consumables
+JIGS.md      the shop jigs: cutting layout, build order, and why each number
 SHOPPING.md  what still needs buying, with the specs that are easy to get wrong
 ```
 
