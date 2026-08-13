@@ -13,7 +13,26 @@ bit sizes don't have to be re-derived in a store aisle.
 | **Mitre saw** | Genesis sliding compound, 10" — almost certainly **GMSDR1015LC** (confirm on the motor plate) | 15A, 4800 RPM. **10" blade, 5/8" arbor.** Crosscuts **12" at 90°**, so the 9-1/4" boards go through in one pass with room to spare. Ships with a 60T carbide blade. |
 | **Circular saw** | Black & Decker, model unrecorded | Carbide-tipped blade fitted, **visibly rusted** — replace before use. |
 | **Jigsaw** | Skil 4225, 3200 SPM | ⚠️ Older model; likely takes **U-shank** blades, not the modern T-shank. Verify before buying blades. |
-| **Drill/driver** | DeWALT DCD771C2, 20V Max, 2-speed | 2 × 1.3Ah XR batteries, charger, bag. |
+| **Drill/driver** | DeWALT DCD771C2, 20V Max, 2-speed | 2 × 1.3Ah XR batteries, charger, bag. No side handle, so anything over ~1" in a Forstner has nothing to react against but your wrist. |
+
+## Accessories and measuring
+
+| | |
+|---|---|
+| **Guide bushings** | Bronze. The one that changed the dado jig: gap = width + bushing OD − bit Ø, so a 3/4" bushing with a 1/2" bit needs only 1/4" of shim, and the jig shrinks from a 6-1/4" gap to 1". |
+| **Router edge guide** | Came with the router. Almost no use on the casework — every cut is positioned along the board's length, past its reach, and perpendicular to the edge it would ride. Earns its keep on the footrest's felt recess. |
+| **Forstner bits** | Axelord 16-piece, alloy steel. Alloy over carbon because Forstners *scrape* and run hot; carbon loses temper around 200°C, which the rim reaches easily. Speed 1, clear chips every half inch. |
+| **Digital caliper** | The tool that makes joinery possible. Stock varies 0.71–0.75 within one board; bits run under nominal; bushing ODs aren't what the box says. A tape can't resolve any of it. |
+| **Combination square** | Test it before trusting it: line against a straight edge, flip, line again. Divergence = twice the error. |
+
+## Jig hardware on hand
+
+| | |
+|---|---|
+| 1/4-20 carriage bolts, 2" | 100. Square shoulder bites the pine so nothing spins while you tighten from above. |
+| 1/4-20 star knobs, 32mm | 4. |
+| Fender washers, 1/4" × 1-1/4" | **The part that decides whether the adjustable jig holds.** A knob straight on MDF is ~1,600 psi; MDF crushes at ~700. A fender washer brings it to ~380. |
+| Aluminium flat bar, 1" × 12" | Sold as 1/4" but listed 6 × 25 × 305 mm — **measure it.** 6 mm is 0.014" under, which makes the dado *tight*. That's the correctable direction: laminate paper (0.004"/sheet) onto the bar until the test cut fits, then tape it and never rebuild the stack. |
 
 ## Clamping
 
@@ -53,7 +72,7 @@ that the motor runs without smell or grinding.
 **Jigsaw shank type.** U-shank and T-shank are not interchangeable, and a Skil
 4225 is old enough to predate T-shank being standard. Look at the blade clamp.
 
-## Consumables to buy
+## Consumables — specs, so they don't get re-derived in an aisle
 
 ### Router bits
 
@@ -83,7 +102,8 @@ a lower speed. Burning comes from dwelling in the cut.
 **Not needed: a pattern bit.** It was the plan for a while, but a top-bearing
 bit can't step depth (the whole depth range across passes has to fit inside the
 bearing's height), which rules it out for the through-cuts. One straight bit and
-one two-fence jig does everything instead.
+one two-fence jig does everything instead — and the guide bushings landed
+before it mattered, which is the better answer anyway.
 
 ### Saw blades
 
@@ -91,6 +111,7 @@ one two-fence jig does everything instead.
 |---|---|---|
 | **Mitre saw** | 10", **60T ATB**, 5/8" arbor, **negative or low hook angle** | Cutting parts to final length. The saw shipped with a 60T carbide blade, but it's been in a shed ~15 years — the carbide won't have dulled, but the plate will have rusted. Not worth reviving a stock budget blade. |
 | **Circular saw** | 7-1/4", **40T ATB**, 5/8" arbor | Ripping boards to one common width, and breaking down MDF. The fitted blade is visibly rusted. 40T rather than a 24T ripper because that ripped edge becomes the visible front edge of the case. |
+| **Jigsaw** | Clean-cut wood blades — ⚠️ **check U- vs T-shank** | Only needed if roughing out lap-slot waste. Optional. |
 
 Freud Diablo, Irwin Marples or CMT — all carried locally, all fine. Roughly
 $40–50 for the 10" and $25 for the 7-1/4".
@@ -101,7 +122,6 @@ and on a sliding saw that means the head grabs and lunges toward you mid-cut.
 Buy a blade whose description says **sliding** or **compound mitre saw**; those
 run a negative hook (around −5°). This is a safety spec, not a finish one, and
 tooth count alone doesn't tell you.
-| **Jigsaw** | Clean-cut wood blades — ⚠️ **check U- vs T-shank** | Only needed if roughing out lap-slot waste. Optional. |
 
 ### Sheet goods and shop stock
 
@@ -115,9 +135,12 @@ tooth count alone doesn't tell you.
 
 | Jig | Status | Notes |
 |---|---|---|
-| **Two-fence U-jig** | to build | Two rails + a crossbar. Gap dialled in by test cut; that one setting cuts all 24 joints. Screw it down once it's right. |
+| **Saw guide** | built | Fence glued to a wide base, then trimmed on **both** sides so the base edge is the cut line for either hand. Removes every offset calculation. |
+| **Cutting station** | built | Sized to handle ripping as well as crosscutting. |
+| **Two-fence U-jig, base-riding** | built | Works, but calibrating by trial and error was slow, and it only fits one shelf thickness. |
+| **Adjustable bushing jig** | building | Bushing rides the rails instead of the router base. Gap set by sandwiching a shelf + a 1/4" shim — self-calibrating, no measuring. Two knobs per rail through oversized holes, so the rail can only slide, never rotate: the failure that made the first jig painful is removed structurally rather than fought. |
 | **Rectangular router sub-base** | optional | Removes rotation as a variable, and stops the round base tipping when it overhangs on the end rabbets. |
-| **Mitre saw auxiliary fence + stop block** | to build | Relieve the stop's bottom corner or sawdust packs in and parts creep longer through the day. |
+| **Mitre saw auxiliary fence + stop block** | ⚠️ blocked | The saw's blade guard doesn't retract. Fix or the mitre saw stays out of the plan. |
 
 ## Notes to self
 
