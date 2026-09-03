@@ -39,10 +39,12 @@ scale(UNIT) {
     else if (PART == "horiz")   horizontal(PART_I);
     else if (PART == "divider") dividers(PART_I);
     else if (PART == "leg")
-        if (SQUARE) leg_square(LEG_CORNER[PART_I][0], LEG_CORNER[PART_I][1]);
-        else        leg_wood(LEG_CORNER[PART_I][0], LEG_CORNER[PART_I][1]);
+        if      (SQUARE) leg_square(LEG_CORNER[PART_I][0], LEG_CORNER[PART_I][1]);
+        else if (METAL)  leg_metal (LEG_CORNER[PART_I][0], LEG_CORNER[PART_I][1]);
+        else             leg_wood  (LEG_CORNER[PART_I][0], LEG_CORNER[PART_I][1]);
     else if (PART == "blocks")
-        for (k = [0 : 3]) leg_blocks(LEG_CORNER[k][0], LEG_CORNER[k][1]);
+        for (k = [0 : 3]) leg_blocks_fitted(LEG_CORNER[k][0], LEG_CORNER[k][1]);
+    else if (PART == "frame")   base_frame();
     else if (PART == "brass")
         for (k = [0 : 3]) leg_ferrule(LEG_CORNER[k][0], LEG_CORNER[k][1]);
     else if (PART == "steel")

@@ -42,7 +42,7 @@ from mathutils import Vector
 # --------------------------------------------------------------------------
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 ap = argparse.ArgumentParser()
-ap.add_argument("--wood", default="walnut", choices=["walnut", "cherry", "pine"])
+ap.add_argument("--wood", default="walnut")
 ap.add_argument("--out", default="projects/wine-rack/renders/beauty.png")
 ap.add_argument("--samples", type=int, default=256)
 ap.add_argument("--res", default="1400x1900")
@@ -57,6 +57,7 @@ ap.add_argument("--model", default="winerack", choices=["winerack", "table"])
 # bonus, put some contrast back into a big flat top that was reading as paint.
 ap.add_argument("--rings", type=float, default=1.0)
 ap.add_argument("--bottles", default="1")
+ap.add_argument("--legs", default="wood", choices=["wood", "metal"])
 args = ap.parse_args(argv)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,6 +81,12 @@ WOODS = {
     "cherry": dict(light=(0.630, 0.372, 0.232), dark=(0.450, 0.242, 0.150),
                    knot=(0.28, 0.14, 0.09), profile="SIN", stops=(0.14, 0.90),
                    rings=320.0, knots=0.0, rough=(0.42, 0.62)),
+    # Ash: ring-porous, so the earlywood pores make an abrupt band the way a
+    # softwood's latewood does -- SAW, not SIN, despite being a hardwood.  Pale
+    # field, narrow grey-brown bands, almost no knots in furniture grade.
+    "ash":    dict(light=(0.842, 0.762, 0.632), dark=(0.518, 0.412, 0.302),
+                   knot=(0.30, 0.22, 0.15), profile="SAW", stops=(0.70, 0.88),
+                   rings=300.0, knots=0.0, rough=(0.46, 0.66)),
     # Pine: pale field, narrow dark latewood, and knots -- a clear pine board
     # reads as anonymous blonde hardwood, which is exactly what went wrong the
     # first time round.
@@ -87,6 +94,9 @@ WOODS = {
                    knot=(0.34, 0.215, 0.115), profile="SAW", stops=(0.78, 0.86),
                    rings=380.0, knots=1.0, rough=(0.40, 0.60)),
 }
+if args.wood not in WOODS:
+    raise SystemExit("scene: unknown wood %r -- have %s"
+                     % (args.wood, ", ".join(sorted(WOODS))))
 SPEC = WOODS[args.wood]
 LIGHT, DARK = SPEC["light"], SPEC["dark"]
 
@@ -170,7 +180,7 @@ MODELS = {
         groups={
             "wood_z": ["stile0", "stile1", "divider",
                        "leg0", "leg1", "leg2", "leg3", "blocks"],
-            "wood_x": ["horiz%d" % i for i in range(7)],
+            "wood_x": ["horiz%d" % i for i in range(7)] + ["frame"],
             "brass": ["brass"],
             "steel": ["steel"],
             "glass": ["bottles"],
@@ -190,6 +200,12 @@ MODELS = {
     ),
 }
 GROUPS = MODELS[args.model]["groups"]
+if args.legs == "metal" and args.model == "winerack":
+    LEGS = ["leg%d" % i for i in range(4)]
+    GROUPS = dict(GROUPS)
+    GROUPS["wood_z"] = [n for n in GROUPS["wood_z"] if n not in LEGS]
+    GROUPS["brass"] = []
+    GROUPS["powder"] = LEGS + GROUPS.pop("steel")
 SMOOTH = MODELS[args.model]["smooth"]
 
 imported = {}
@@ -462,6 +478,18 @@ def steel_material():
     return mat
 
 
+def powder_material():
+    """Satin black powder coat.  Metallic = 0 on purpose -- powder coat is a
+    pigmented film over the steel, so it reflects like paint, not like metal.
+    Setting Metallic = 1 here is what makes rendered black legs look like
+    chrome that has been tinted."""
+    mat, nt, bsdf = new_mat("powder")
+    bsdf.inputs["Base Color"].default_value = srgb_to_linear((0.048, 0.050, 0.055))
+    bsdf.inputs["Metallic"].default_value = 0.0
+    bsdf.inputs["Roughness"].default_value = 0.38
+    return mat
+
+
 def glass_material():
     """Bottle glass.  The bottles are solid meshes, so plain transmission makes
     them glow like lanterns.  Volume absorption is what actually makes a wine
@@ -504,6 +532,7 @@ MATS = {
     "wood_xq": wood_material("wood_xq", "X", pith_d=0.42),
     "brass": brass_material(),
     "steel": steel_material(),
+    "powder": powder_material(),
     "glass": glass_material(),
 }
 for group, objs in imported.items():

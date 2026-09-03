@@ -105,6 +105,10 @@ LEG_MOUNT   = "plate";
 //  "square"  square section tapered on its two INNER faces, no splay, held by
 //            glue blocks instead of hardware -- the scandinavian look, and you
 //            can make these yourself with a table saw and a hand plane.
+//  "metal"   bought black steel, same splay and the same plate, but far
+//            thinner than anything turnable in wood -- steel carries the load
+//            in a diameter wood could not.  That thinness is the whole look,
+//            and it is why pale wood suits it: the base nearly disappears.
 LEG_STYLE = "round";
 
 SQ_TOP   = 1.50;    // square leg, across the flats at the top
@@ -114,6 +118,25 @@ SQ_INSET = 0.125;   // reveal between the leg's outer faces and the case sides
 // blocks have a flat parallel face to sit against.  Taper from the very top and
 // the blocks meet a sloping face and leave a wedge-shaped gap.
 SQ_STRAIGHT = 1.50;
+// Total lean off plumb for the SQUARE leg, degrees.  Its own parameter rather
+// than a consequence of LEG_STYLE: square-and-splayed is a real combination --
+// it is what most mid-century casework actually stands on -- and tying splay to
+// the leg's cross-section made the model unable to express it.
+// 0 is the nordic reading, 6-10 the mid-century one.
+SQ_SPLAY = 0;
+
+// Put the square legs on their own BASE FRAME instead of straight onto the case
+// corners.  This is how the mid-century casework it comes from is actually
+// built, and it is a construction decision before it is a visual one: legs
+// joined to rails are a single-plane joint, where legs joined to a case corner
+// need a compound one.  The frame is assembled flat on the bench, checked
+// square, and then screwed on as one piece.
+// Visually it also sets the base in from the case's faces, so the box reads as
+// floating on a shadow gap rather than standing on stilts.
+SQ_FRAME  = false;
+FRAME_IN  = 0.75;   // frame set in from the case edges -- the shadow gap
+FRAME_H   = 2.00;   // rail depth, seen from the side
+FRAME_T   = 0.75;   // rail thickness
 GB_XY    = 1.00;    // glue blocks in the inner corner
 GB_H     = 1.25;
 
@@ -131,13 +154,17 @@ W = COLS*OPENING_W + (COLS+1)*T;        // 10.25 as a wine rack
 H = ROWS*OPENING_H + (ROWS+1)*T;        // 29.25 as a wine rack
 
 SQUARE   = (LEG_STYLE == "square");
+METAL    = (LEG_STYLE == "metal");
+// Steel is stiff enough to be slender.  A wooden leg this thin would snap at
+// the shoulder, which is why the turned version has to be 1-1/2" at the top.
+LEG_TOP_D_EFF = METAL ? 1.00 : LEG_TOP_D;
+LEG_BOT_D_EFF = METAL ? 0.50 : LEG_BOT_D;
 PLATED   = (LEG_MOUNT == "plate") && !SQUARE;
 MOUNT_XY = PLATED ? PLATE_XY : BLOCK_XY;
 // a square leg butts straight up against the underside; nothing in between
 MOUNT_H  = SQUARE ? 0 : (PLATED ? PLATE_T + PLATE_BOSS : BLOCK_H);
 
-// Square legs stand plumb -- the splay is a mid-century idiom, not a nordic one
-LEG_TILT_EFF = SQUARE ? 0 : LEG_TILT_SPEC;
+LEG_TILT_EFF = SQUARE ? SQ_SPLAY : LEG_TILT_SPEC;
 
 // Per-axis splay that adds up to LEG_TILT_EFF of total lean:
 // cos(splay) * cos(splay) == cos(tilt).
@@ -190,6 +217,7 @@ WALNUT  = "#5b3a24";
 WALNUT2 = "#6b4630";
 WALNUT3 = "#4d3020";
 BRASS   = "#c8a34a";
+POWDER  = "#17181a";   // satin black powder coat
 STEEL   = "#3c4046";
 
 // =============================================================
@@ -316,7 +344,7 @@ TENON_D = 1.00;
 TENON_L = 1.25;
 
 // shaft diameter s inches down the leg axis from the shoulder
-function shaft_d(s) = LEG_TOP_D + (LEG_BOT_D - LEG_TOP_D) * s / LEG_AXIS_L;
+function shaft_d(s) = LEG_TOP_D_EFF + (LEG_BOT_D_EFF - LEG_TOP_D_EFF) * s / LEG_AXIS_L;
 
 // leg axis coordinates: origin at the shoulder, shaft runs down -Z.
 // "over" extends the cone past the shoulder so the flat shoulder cut has
@@ -363,6 +391,18 @@ module leg_wood(sx, sy) {
 // the leg, so all four sit down and the piece is exactly OVERALL_H tall
 module below_floor() { translate([-60, -60, -LEG_RISE - 60]) cube([120, 120, 60]); }
 
+// Bought steel leg.  No ferrule -- the taper runs all the way down and is
+// trimmed flat to the floor, the same trick the ferrule does on the wooden one.
+module leg_metal(sx, sy) {
+    over = 0.3;
+    color(POWDER) difference() {
+        at_leg(sx, sy) translate([0, 0, -LEG_AXIS_L - over])
+            cylinder(h = LEG_AXIS_L + over,
+                     d1 = shaft_d(LEG_AXIS_L + over), d2 = shaft_d(0));
+        below_floor();
+    }
+}
+
 module leg_ferrule(sx, sy) {
     over = 0.3;   // run past the foot, then trim flat to the floor
     color(BRASS) difference() {
@@ -383,28 +423,69 @@ module corner_slab(w, dx, dy, h) {
     translate([min(0, dx*w), min(0, dy*w), 0]) cube([w, w, h]);
 }
 
-function leg_xo(sx) = (sx < 0) ? SQ_INSET : W - SQ_INSET;
-function leg_yo(sy) = (sy < 0) ? SQ_INSET : DEPTH - SQ_INSET;
+SQ_IN = SQ_FRAME ? FRAME_IN : SQ_INSET;
+function leg_xo(sx) = (sx < 0) ? SQ_IN : W - SQ_IN;
+function leg_yo(sy) = (sy < 0) ? SQ_IN : DEPTH - SQ_IN;
 
-module leg_square(sx, sy) {
+// Origin at the leg's top OUTER corner, so the splay pivots exactly there and
+// the reveal against the case side stays put whatever the angle.
+module at_sq(sx, sy) {
+    translate([leg_xo(sx), leg_yo(sy), 0])
+        rotate([leg_ax(sy), leg_ay(sx), 0]) children();
+}
+
+SQ_OVER = 0.4;   // run the foot past the floor, then trim flat to it
+// ...and past the case underside at the other end, for the same reason: the
+// shoulder is cut square to the FLOOR, not square to the leg.  That cut is the
+// compound angle, and it is the whole difficulty of a splayed square leg.
+SQ_UP = 0.6;
+
+module sq_leg_shape(sx, sy, grow = 0) {
     dx = (sx < 0) ? 1 : -1;
     dy = (sy < 0) ? 1 : -1;
-    color(WALNUT) union() {
+    union() {
         // square post at the top -- runs 0.02 up into the case rather than
         // stopping flush on its face
-        translate([leg_xo(sx), leg_yo(sy), -SQ_STRAIGHT])
-            corner_slab(SQ_TOP, dx, dy, SQ_STRAIGHT + 0.02);
+        translate([0, 0, -SQ_STRAIGHT])
+            corner_slab(SQ_TOP + grow, dx, dy, SQ_STRAIGHT + SQ_UP);
         hull() {
-            translate([leg_xo(sx), leg_yo(sy), -SQ_STRAIGHT])
-                corner_slab(SQ_TOP, dx, dy, 0.02);
-            translate([leg_xo(sx), leg_yo(sy), -LEG_LENGTH])
-                corner_slab(SQ_BOT, dx, dy, 0.02);
+            translate([0, 0, -SQ_STRAIGHT])
+                corner_slab(SQ_TOP + grow, dx, dy, 0.02);
+            translate([0, 0, -LEG_AXIS_L - SQ_OVER])
+                corner_slab(SQ_BOT + grow, dx, dy, 0.02);
         }
+    }
+}
+
+module leg_square(sx, sy) {
+    // A splayed leg cut square to its own axis stands on an edge and rocks, so
+    // the foot is trimmed to the floor plane instead -- same trick the brass
+    // ferrule does on the turned leg.
+    color(WALNUT) difference() {
+        at_sq(sx, sy) sq_leg_shape(sx, sy);
+        below_floor();
+        translate([-60, -60, 0.02]) cube([120, 120, 60]);   // flat to the case
     }
 }
 
 // Two blocks hugging the leg's inner faces.  Long grain to long grain on both
 // the leg and the underside of the case, which is why no hardware is needed.
+// Four rails in a rectangle, hung under the case.  Their outer faces line up
+// with the legs' outer faces, so leg and rail read as one continuous surface
+// and the joint between them disappears.
+module base_frame() {
+    x0 = FRAME_IN;  x1 = W - FRAME_IN;
+    y0 = FRAME_IN;  y1 = DEPTH - FRAME_IN;
+    color(WALNUT2) translate([0, 0, -FRAME_H]) {
+        // running in x, front and back
+        translate([x0, y0, 0])            cube([x1 - x0, FRAME_T, FRAME_H]);
+        translate([x0, y1 - FRAME_T, 0])  cube([x1 - x0, FRAME_T, FRAME_H]);
+        // running in y, left and right
+        translate([x0, y0, 0])            cube([FRAME_T, y1 - y0, FRAME_H]);
+        translate([x1 - FRAME_T, y0, 0])  cube([FRAME_T, y1 - y0, FRAME_H]);
+    }
+}
+
 module leg_blocks(sx, sy) {
     dx = (sx < 0) ? 1 : -1;
     dy = (sy < 0) ? 1 : -1;
@@ -420,12 +501,27 @@ module leg_blocks(sx, sy) {
     }
 }
 
+// The blocks meet the leg on its own faces, so once the leg leans they are no
+// longer simple rectangles.  Cutting the leg out of them is the honest version
+// -- and it shows the real cost of splaying a square leg at a case corner:
+// this face is a compound angle, and it is why a separate base frame (legs
+// joined to rails, then the frame screwed under the case) is how the pieces
+// this comes from are actually built.
+module leg_blocks_fitted(sx, sy) {
+    difference() {
+        leg_blocks(sx, sy);
+        at_sq(sx, sy) sq_leg_shape(sx, sy, 0.004);
+    }
+}
+
 module base(explode = 0) {
     if (SQUARE) {
         for (sx = [-1, 1], sy = [-1, 1]) {
-            translate([0, 0, -explode * 0.5]) leg_blocks(sx, sy);
+            if (!SQ_FRAME)
+                translate([0, 0, -explode * 0.5]) leg_blocks_fitted(sx, sy);
             translate([0, 0, -explode * 2.2]) leg_square(sx, sy);
         }
+        if (SQ_FRAME) translate([0, 0, -explode * 0.5]) base_frame();
     } else base_round(explode);
 }
 
@@ -459,8 +555,8 @@ module base_round(explode = 0) {
         }
 
         translate([0, 0, -explode * 2.2]) {
-            leg_wood(sx, sy);
-            leg_ferrule(sx, sy);
+            if (METAL) leg_metal(sx, sy);
+            else { leg_wood(sx, sy); leg_ferrule(sx, sy); }
         }
     }
 }
@@ -591,11 +687,14 @@ echo(EGG
      : str("divider length      = ", OPENING_H + 2*DADO_DIV, " x", ROWS * (COLS - 1)));
 if (show_legs) {
     echo(str("leg style           = ", LEG_STYLE,
-             SQUARE ? "  (made: square, tapered inner faces, plumb)"
+             SQUARE ? str("  (made: square, tapered inner faces, ",
+                          SQ_SPLAY == 0 ? "plumb)"
+                                        : str(SQ_SPLAY, " deg splay)"))
                     : str("  (bought: ", LEG_MOUNT, " mount, ",
                           LEG_TILT_SPEC, " deg splay)")));
     echo(str("leg length          = ", LEG_LENGTH));
-    echo(SQUARE ? str("  -> section        = ", SQ_TOP, " sq tapering to ", SQ_BOT)
+    echo(SQUARE ? str("  -> section        = ", SQ_TOP, " sq tapering to ", SQ_BOT,
+                      SQ_SPLAY == 0 ? "" : str(", per-axis splay ", LEG_SPLAY, " deg"))
                 : str("  -> per-axis splay = ", LEG_SPLAY, " deg"));
     echo(str("  -> rise to case   = ", LEG_RISE));
 } else {

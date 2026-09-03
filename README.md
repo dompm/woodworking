@@ -7,11 +7,18 @@ generated from that model, so none of it can drift from the design.
 
 | | | |
 |---|---|---|
-| **[Document unit](projects/document-unit/)** | 10 cells for letter and A4 laid flat, in pine. 26-1/4 × 11 × 22. | **building first** · [guide](https://claude.ai/code/artifact/87fcd98c-7703-488a-8ec8-152ccdd2b3c9) |
+| **[Document unit](projects/document-unit/)** | 10 cells for letter and A4 laid flat, in pine. 26-1/4 × 11 × 22. | **built** · [guide](https://claude.ai/code/artifact/87fcd98c-7703-488a-8ec8-152ccdd2b3c9) |
 | **[Wine rack](projects/wine-rack/)** | 12 bottles in walnut, on splayed tapered legs. 10-1/4 × 9 × 39-1/2. | the real one · [guide](https://claude.ai/code/artifact/a3f2afa2-34b5-4bcf-a35a-0f884b502578) |
 | **[Footrest](projects/footrest/)** | Solid ramp on splayed sides, felt inset. 17 × 10-7/16 × 6-1/4. | a brace, not a platform |
 | **[Salt boxes](projects/salt-boxes/)** | A pair in hardwood, swivelling lids. 3-1/4 sq. | MSG and sugar |
 | **[Coffee table](projects/coffee-table/)** | 48 × 21 × 15 in solid walnut, all joinery hidden. | someday |
+
+![The document unit, built](projects/document-unit/photos/built.jpg)
+
+The first one finished, and it went straight to the kitchen rather than the
+closet it was drawn for. Knotty pine, water-based matte, no back panel. Every
+joint in it — twelve housings, ten lap slots — came off two settings of one
+shop-made jig.
 
 ![Walnut wine rack](projects/wine-rack/renders/beauty_walnut.png)
 
