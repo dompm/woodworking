@@ -11,7 +11,7 @@ generated from that model, so none of it can drift from the design.
 | **[Wine rack](projects/wine-rack/)** | 12 bottles in walnut, on splayed tapered legs. 10-1/4 × 9 × 39-1/2. | the real one · [guide](https://claude.ai/code/artifact/a3f2afa2-34b5-4bcf-a35a-0f884b502578) |
 | **[Footrest](projects/footrest/)** | Solid ramp on splayed sides, felt inset. 17 × 10-7/16 × 6-1/4. | a brace, not a platform |
 | **[Salt boxes](projects/salt-boxes/)** | A pair in hardwood, swivelling lids. 3-1/4 sq. | MSG and sugar |
-| **[Coffee table](projects/coffee-table/)** | 48 × 21 × 15 in solid walnut, all joinery hidden. | someday |
+| **[Bedside table](projects/bedside-table/)** | 16 × 12 × 21 in yellow birch on 14" tapered steel legs. | self-squaring rabbets, open cubby |
 
 ![The document unit, built](projects/document-unit/photos/built.jpg)
 

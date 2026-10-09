@@ -49,8 +49,9 @@ ap.add_argument("--res", default="1400x1900")
 ap.add_argument("--parts", default="projects/wine-rack/exports/parts")
 ap.add_argument("--view", default="hero",
                 choices=["hero", "front", "detail", "wide",
-                         "table", "table_end", "table_detail"])
-ap.add_argument("--model", default="winerack", choices=["winerack", "table"])
+                         "table", "table_end", "table_detail",
+                         "bedside_hero", "bedside_front", "bedside_detail"])
+ap.add_argument("--model", default="winerack", choices=["winerack", "table", "bedside"])
 # Ring scale multiplier.  The ring pitch that reads as walnut on a 9"-wide
 # carcass board turns into moire on a 1-3/4" leg: same physical pitch, far
 # fewer pixels across the part.  Coarser rings calm the legs down and, as a
@@ -93,6 +94,14 @@ WOODS = {
     "pine":   dict(light=(0.885, 0.780, 0.590), dark=(0.430, 0.278, 0.148),
                    knot=(0.34, 0.215, 0.115), profile="SAW", stops=(0.78, 0.86),
                    rings=380.0, knots=1.0, rough=(0.40, 0.60)),
+    # Yellow birch: diffuse-porous hardwood (SIN), pale amber/golden field with
+    # warm light reddish-brown growth bands, dense, very fine uniform grain.
+    "yellow_birch": dict(light=(0.835, 0.725, 0.535), dark=(0.620, 0.495, 0.325),
+                         knot=(0.32, 0.22, 0.14), profile="SIN", stops=(0.20, 0.85),
+                         rings=340.0, knots=0.0, rough=(0.40, 0.58)),
+    "birch":        dict(light=(0.835, 0.725, 0.535), dark=(0.620, 0.495, 0.325),
+                         knot=(0.32, 0.22, 0.14), profile="SIN", stops=(0.20, 0.85),
+                         rings=340.0, knots=0.0, rough=(0.40, 0.58)),
 }
 if args.wood not in WOODS:
     raise SystemExit("scene: unknown wood %r -- have %s"
@@ -145,7 +154,7 @@ for vt in ("Khronos PBR Neutral", "Filmic", "AgX", "Standard"):
 # A big horizontal top faces the lights squarely and blows out where the wine
 # rack's mostly vertical faces do not; half a stop down keeps the walnut brown
 # instead of tan.
-scene.view_settings.exposure = -0.35 if args.model == "table" else 0.0
+scene.view_settings.exposure = -0.35 if args.model in ("table", "bedside") else 0.0
 
 
 # --------------------------------------------------------------------------
@@ -197,6 +206,15 @@ MODELS = {
             "wood_zq": ["leg0", "leg1", "leg2", "leg3"],
         },
         smooth=set(),
+    ),
+    "bedside": dict(
+        groups={
+            "wood_xq": ["top", "bottom"],
+            "wood_zq": ["left", "right"],
+            "powder": ["legs"],
+            "brass": ["glides"],
+        },
+        smooth={"legs", "glides"},
     ),
 }
 GROUPS = MODELS[args.model]["groups"]
@@ -587,6 +605,10 @@ if args.model == "table":
     AIM_Z = TOP + 0.08
     KEY_Z, FILL_Z, RIM_Z = 2.40, 1.90, 2.60
     SPREAD, SIZE, POWER = 1.0, 2.0, 0.85
+elif args.model == "bedside":
+    AIM_Z = TOP * 0.52
+    KEY_Z, FILL_Z, RIM_Z = 1.65, 1.35, 1.75
+    SPREAD, SIZE, POWER = 1.0, 1.4, 0.90
 else:
     AIM_Z = TOP * 0.46
     KEY_Z, FILL_Z, RIM_Z = TOP * 0.66, TOP * 0.60, TOP * 0.70
@@ -600,13 +622,13 @@ area_light("fill", (CX - 2.1 * SPREAD, CY - 1.7 * SPREAD, FILL_Z), target,
 area_light("rim", (CX - 1.3 * SPREAD, CY + 2.1 * SPREAD, RIM_Z), target,
            1.0 * SIZE, 80 * POWER, (1.0, 0.98, 0.95))
 
-# A coffee table is mostly UNDERSIDE from any normal viewpoint, and a rig built
-# for a tall case leaves the shelf, the aprons and every joint in it black.  One
-# broad, weak, low source from the front opens all of that without touching the
-# top, which is already lit from above.
+# A coffee table or bedside cubby has interior/underside shadow from any normal viewpoint.
 if args.model == "table":
     area_light("under", (CX + 0.5, CY - 2.2, 0.26),
                Vector((CX, CY, 0.17)), 2.6, 90, (1.0, 0.96, 0.90))
+elif args.model == "bedside":
+    area_light("under", (CX + 0.3, CY - 1.8, 0.32),
+               Vector((CX, CY, 0.32)), 1.8, 65, (1.0, 0.96, 0.90))
 
 
 # --------------------------------------------------------------------------
@@ -627,6 +649,10 @@ VIEWS = {
     # a sixth element shifts the aim point along the length, as a fraction of
     # the half length -- the wine rack's views omit it and are unaffected
     "table_detail": (46, 4, 1.00, 85, 0.44, -0.74, -0.55),
+    # Bedside table: 0.53 m tall, 0.46 m wide
+    "bedside_hero":   (32, 14, 1.95, 75, 0.52),
+    "bedside_front":  (0, 8, 1.95, 80, 0.52),
+    "bedside_detail": (36, 12, 1.05, 85, 0.80),
 }
 _v = VIEWS[args.view]
 az, el, dist, focal, aim = _v[:5]
