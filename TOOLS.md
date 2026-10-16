@@ -3,8 +3,6 @@
 What's on hand, and what each tool needs in consumables. Kept here so blade and
 bit sizes don't have to be re-derived in a store aisle.
 
-**Open questions are marked ⚠️ — resolve these before ordering anything.**
-
 ## Power tools
 
 | Tool | Model | Notes |
@@ -14,13 +12,20 @@ bit sizes don't have to be re-derived in a store aisle.
 | **Circular saw** | Black & Decker, model unrecorded | Carbide-tipped blade fitted, **visibly rusted** — replace before use. |
 | **Jigsaw** | Skil 4225, 3200 SPM | ⚠️ Older model; likely takes **U-shank** blades, not the modern T-shank. Verify before buying blades. |
 | **Drill/driver** | DeWALT DCD771C2, 20V Max, 2-speed | 2 × 1.3Ah XR batteries, charger, bag. No side handle, so anything over ~1" in a Forstner has nothing to react against but your wrist. |
+| **Track saw** | Makita SP6000X1 (corded 6-1/2" plunge saw + 55" / 1400 mm track) | 12A, variable speed (2,000–5,800 RPM). Takes **165 mm blades, 20 mm arbor**. Has scoring stop button (2 mm depth) to prevent tearout on veneered face before the full pass. 55" track rips boards up to ~48" in one setup. Replaces the shop-made circular saw guide. |
+
+## Hand tools
+
+| Tool | Model | Notes |
+|---|---|---|
+| **Smoothing plane** | Stanley No. 4 | Fully restored (sole flattened, iron honed). 2" iron. Used for smoothing faces and edges, flushing joints without dishing, and squaring ends on a shooting board. Bypasses sandpaper clogging and dust on pine and hardwoods. |
 
 ## Accessories and measuring
 
 | | |
 |---|---|
 | **Guide bushings** | Bronze. The one that changed the dado jig: gap = width + bushing OD − bit Ø, so a 3/4" bushing with a 1/2" bit needs only 1/4" of shim, and the jig shrinks from a 6-1/4" gap to 1". |
-| **Router edge guide** | Came with the router. Almost no use on the casework — every cut is positioned along the board's length, past its reach, and perpendicular to the edge it would ride. Earns its keep on the footrest's felt recess. |
+| **Router edge guide** | Came with the router. Useful for edge-parallel dados, grooves, and edge recesses within reach of the board's reference edge. |
 | **Forstner bits** | Axelord 16-piece, alloy steel. Alloy over carbon because Forstners *scrape* and run hot; carbon loses temper around 200°C, which the rim reaches easily. Speed 1, clear chips every half inch. |
 | **Digital caliper** | The tool that makes joinery possible. Stock varies 0.71–0.75 within one board; bits run under nominal; bushing ODs aren't what the box says. A tape can't resolve any of it. |
 | **Combination square** | Test it before trusting it: line against a straight edge, flip, line again. Divergence = twice the error. |
@@ -38,52 +43,26 @@ bit sizes don't have to be re-derived in a store aisle.
 
 | | |
 |---|---|
+| 4 × Quick-release clamps, 24" | One-handed / quick positioning for track saw guides, assembly, and jigs. |
+| 2 × Quick-release clamps, 12" | Fast hold-down and workholding. |
+| 2 × F-clamps, 24" bar | Solid pressure for wider assemblies up to ~25". |
 | 2 × F-clamps, 12" bar | ~13" actual opening |
 | 2 × F-clamps, 7" | |
 | 8 × ratchet straps | Standing in for long bar clamps — see below |
 
-**Nothing spans the document unit's 26-1/4" width.** The eight straps cover it
-(a strap loop delivers ~2× its tension), so no clamp purchase is needed for
-that build. The wine rack is only 10-1/4" wide, so the 12" clamps already
-handle it. The first thing that genuinely needs 36" capacity is the coffee
-table's glued-up top.
-
-## ⚠️ Before the build: shake down the shed tools
-
-The mitre saw and circular saw sat in a shed for ~15 years, and the whole plan
-now leans on the mitre saw. **Test it before buying materials, not after.**
-
-**The slide rails matter more than the blade.** Rust or stiffness there makes
-the head wander mid-cut, which no blade fixes. Clean them and use a *dry*
-lubricant — oil holds sawdust and makes it worse.
-
-**Check square in both axes.** A slider can be out at the fence and at the
-bevel. The flip-and-butt test from the guide catches the fence: cut a piece,
-flip one half, butt the cut edges — any error doubles.
-
-**Check for play.** Rock the head side to side at the end of the slide. Any
-slop shows up as a cut that isn't square through the thickness.
-
-Also worth checking: cord condition, that the blade guard returns freely, and
-that the motor runs without smell or grinding.
-
-## ⚠️ Resolve before buying
-
-**Jigsaw shank type.** U-shank and T-shank are not interchangeable, and a Skil
-4225 is old enough to predate T-shank being standard. Look at the blade clamp.
-
 ## Consumables — specs, so they don't get re-derived in an aisle
 
-### Router bits
+### Router bits (1/2" shank)
 
-| Bit | Why |
+| Bit | Purpose / Notes |
 |---|---|
-| **1/2" straight, 2-flute carbide, 1/2" shank** | Does every joint in the document unit — 12 stile housings, 10 lap slots, 2 divider-end housings. All 3/4" wide, all off one jig setting. |
+| **1/2" straight, 2-flute carbide** | General joinery: dadoes, stile housings, and deep lap slots. Pairs with 3/4" guide bushing for 3/4" wide cuts off one jig setting. 1/2" shank minimizes deflection on deep passes. |
+| **Flush trim bit (bottom bearing)** | Trimming pieces flush to a template, duplicating parts, and squaring/cleaning proud faces. |
+| **Chamfer bit (45°)** | Clean, consistent edge bevels and breaking arrises without risk of uneven hand-sanding. |
 
-The 1/2" shank is the one to buy now that the collet is confirmed — noticeably
-stiffer than 1/4" in the 4-5/8"-deep lap slots, where deflection would show up
-as a bowed slot wall. Cutting length isn't critical with a base-riding jig:
-there's no bearing, so none of the template-thickness geometry applies.
+The 1/2" shank is noticeably stiffer than 1/4" in deep cuts and housings, where
+deflection would show up as a bowed cut wall. Cutting length isn't critical with
+a base-riding or bushing jig since no bearing limits the depth step.
 
 **Speed: run it flat out.** The variable speed exists for large-diameter bits,
 where rim speed gets dangerous — anything under 1" wants full RPM. The rough
@@ -111,7 +90,8 @@ before it mattered, which is the better answer anyway.
 |---|---|---|
 | **Mitre saw** | 10", **60T ATB**, 5/8" arbor, **negative or low hook angle** | Cutting parts to final length. The saw shipped with a 60T carbide blade, but it's been in a shed ~15 years — the carbide won't have dulled, but the plate will have rusted. Not worth reviving a stock budget blade. |
 | **Circular saw** | 7-1/4", **40T ATB**, 5/8" arbor | Ripping boards to one common width, and breaking down MDF. The fitted blade is visibly rusted. 40T rather than a 24T ripper because that ripped edge becomes the visible front edge of the case. |
-| **Jigsaw** | Clean-cut wood blades — ⚠️ **check U- vs T-shank** | Only needed if roughing out lap-slot waste. Optional. |
+| **Track saw** | 6-1/2" (165 mm), **48T or 56T ATB/Hi-ATB**, 20 mm arbor, thin kerf (~1.45–2.2 mm) | Clean crosscuts and finish rips in solid wood or sheet goods with zero tearout against the guide rail's splinter strip. Makita stock blade (B-57342) is excellent. |
+| **Jigsaw** | Clean-cut wood blades (check U- vs T-shank) | Roughing out waste in joinery or curved cuts. |
 
 Freud Diablo, Irwin Marples or CMT — all carried locally, all fine. Roughly
 $40–50 for the 10" and $25 for the 7-1/4".
@@ -128,21 +108,26 @@ tooth count alone doesn't tell you.
 | | For |
 |---|---|
 | 1 × 3/4" MDF handy panel (2×4 ft) | Router jig rails + crossbar, mitre saw auxiliary fence, stop blocks |
-| 1 × rigid foam board or scrap OSB | Sacrificial backer under the through-cuts |
-| 1 × straight 2x4 | Two 22" cauls for the glue-up |
+| 1 × rigid foam board or scrap OSB | Sacrificial backer under track saw and router through-cuts |
+| 1 × straight 2x4 | Clamping cauls for glue-ups |
 
 ## Shop-made jigs
 
 | Jig | Status | Notes |
 |---|---|---|
-| **Saw guide** | built | Fence glued to a wide base, then trimmed on **both** sides so the base edge is the cut line for either hand. Removes every offset calculation. |
+| **Saw guide** | built | Fence glued to a wide base, trimmed on both sides. Superseded by track saw for rips, but handy for rough circular saw work. |
 | **Cutting station** | built | Sized to handle ripping as well as crosscutting. |
 | **Two-fence U-jig, base-riding** | built | Works, but calibrating by trial and error was slow, and it only fits one shelf thickness. |
 | **Adjustable bushing jig** | building | Bushing rides the rails instead of the router base. Gap set by sandwiching a shelf + a 1/4" shim — self-calibrating, no measuring. Two knobs per rail through oversized holes, so the rail can only slide, never rotate: the failure that made the first jig painful is removed structurally rather than fought. |
 | **Rectangular router sub-base** | optional | Removes rotation as a variable, and stops the round base tipping when it overhangs on the end rabbets. |
-| **Mitre saw auxiliary fence + stop block** | ⚠️ blocked | The saw's blade guard doesn't retract. Fix or the mitre saw stays out of the plan. |
+| **Mitre saw auxiliary fence + stop block** | on hold | Saw blade guard needs servicing before building fence. |
 
 ## Notes to self
+
+**Tune up sliding saws before trusting cuts:**
+- *Slide rails:* Clean thoroughly and use dry lubricant only (wet oil attracts sawdust and gums up). Stiffness causes the head to wander mid-cut.
+- *Squareness in both axes:* Check both fence and bevel. Use the flip-and-butt test: cut a board, flip one half, and butt the cut edges; any angular error doubles.
+- *Head play:* Rock the head side to side at full extension. Any slop shows up as a cut that isn't square through board thickness.
 
 **Don't cut to the laser.** Budget-saw lasers drift out of alignment and are
 only ever as accurate as their last calibration. Cut to the kerf the blade
