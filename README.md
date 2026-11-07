@@ -13,12 +13,9 @@ generated from that model, so none of it can drift from the design.
 | **[Salt boxes](projects/salt-boxes/)** | A pair in hardwood, swivelling lids. 3-1/4 sq. | MSG and sugar |
 | **[Bedside table](projects/bedside-table/)** | 16 × 12 × 21 in yellow birch on 14" tapered steel legs. | self-squaring rabbets, open cubby |
 
-![The document unit, built](projects/document-unit/photos/built.jpg)
-
-The first one finished, and it went straight to the kitchen rather than the
-closet it was drawn for. Knotty pine, water-based matte, no back panel. Every
-joint in it — twelve housings, ten lap slots — came off two settings of one
-shop-made jig.
+| Kitchen | Closet |
+| :---: | :---: |
+| ![Document unit in kitchen](projects/document-unit/photos/built-kitchen.jpg) | ![Document unit in closet](projects/document-unit/photos/built-closet.jpg) |
 
 ![Walnut wine rack](projects/wine-rack/renders/beauty_walnut.png)
 
