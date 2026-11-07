@@ -63,9 +63,9 @@ RES_X, RES_Y = (int(v) for v in args.res.split("x"))
 #                 the field is pale earlywood and the dark latewood is a narrow
 #                 hard-edged line rather than half the surface.
 WOODS = {
-    "walnut": dict(light=(0.352, 0.252, 0.182), dark=(0.198, 0.130, 0.090),
+    "walnut": dict(light=(0.352, 0.258, 0.190), dark=(0.255, 0.174, 0.120),
                    knot=(0.13, 0.085, 0.06), profile="SIN", stops=(0.22, 0.84),
-                   rings=300.0, knots=0.0, rough=(0.44, 0.64)),
+                   rings=85.0, knots=0.0, rough=(0.48, 0.56)),
     "cherry": dict(light=(0.630, 0.372, 0.232), dark=(0.450, 0.242, 0.150),
                    knot=(0.28, 0.14, 0.09), profile="SIN", stops=(0.14, 0.90),
                    rings=320.0, knots=0.0, rough=(0.42, 0.62)),
@@ -160,6 +160,10 @@ MODELS = {
     ),
 }
 GROUPS = MODELS[args.model]["groups"]
+if args.wood == "walnut" and args.legs == "wood" and args.model == "winerack":
+    GROUPS = {group: list(names) for group, names in GROUPS.items()}
+    GROUPS["wood_zq"] = [name for name in GROUPS["wood_z"] if name.startswith("leg")]
+    GROUPS["wood_z"] = [name for name in GROUPS["wood_z"] if not name.startswith("leg")]
 if args.legs == "metal" and args.model == "winerack":
     LEGS = ["leg%d" % i for i in range(4)]
     GROUPS = dict(GROUPS)
@@ -320,7 +324,7 @@ def wood_material(name, length_axis, pith_d=0.110, warp=1.0, quarter=False):
     # 20 mm of wander across a ring pitch under a millimetre is what turns
     # concentric circles into cathedral figure.  Parts that are meant to read as
     # riftsawn get a fraction of it (see wood_zq).
-    amt.inputs["Scale"].default_value = 0.020 * warp
+    amt.inputs["Scale"].default_value = (0.004 if args.wood == "walnut" else 0.020) * warp
     nt.links.new(ctr.outputs["Vector"], amt.inputs[0])
 
     warped = nt.nodes.new("ShaderNodeVectorMath")
@@ -386,13 +390,37 @@ def wood_material(name, length_axis, pith_d=0.110, warp=1.0, quarter=False):
     nt.links.new(warped.outputs["Vector"], rings.inputs["Vector"])
     nt.links.new(deflect.outputs["Value"], rings.inputs["Phase Offset"])
 
+    figure = rings.outputs["Fac"]
+    if args.wood == "walnut":
+        # A periodic ring field alone reads as printed stripes. Irregular,
+        # longitudinal fibres carry the colour; growth rings remain secondary.
+        fibrespace = nt.nodes.new("ShaderNodeMapping")
+        fibrespace.inputs["Scale"].default_value = tuple(
+            1.8 if ax == axis else 140.0 for ax in ("X", "Y", "Z"))
+        nt.links.new(base.outputs["Vector"], fibrespace.inputs["Vector"])
+        fibres = nt.nodes.new("ShaderNodeTexNoise")
+        fibres.inputs["Scale"].default_value = 1.0
+        fibres.inputs["Detail"].default_value = 3.0
+        fibres.inputs["Roughness"].default_value = 0.65
+        nt.links.new(fibrespace.outputs["Vector"], fibres.inputs["Vector"])
+        ring_weight = nt.nodes.new("ShaderNodeMath")
+        ring_weight.operation = "MULTIPLY"
+        ring_weight.inputs[1].default_value = 0.18
+        nt.links.new(figure, ring_weight.inputs[0])
+        blend = nt.nodes.new("ShaderNodeMath")
+        blend.operation = "MULTIPLY_ADD"
+        blend.inputs[1].default_value = 0.82
+        nt.links.new(fibres.outputs["Fac"], blend.inputs[0])
+        nt.links.new(ring_weight.outputs[0], blend.inputs[2])
+        figure = blend.outputs[0]
+
     ramp = nt.nodes.new("ShaderNodeValToRGB")
     ramp.color_ramp.interpolation = "EASE" if SPEC["profile"] == "SAW" else "B_SPLINE"
     ramp.color_ramp.elements[0].position = SPEC["stops"][0]
     ramp.color_ramp.elements[0].color = srgb_to_linear(LIGHT)
     ramp.color_ramp.elements[1].position = SPEC["stops"][1]
     ramp.color_ramp.elements[1].color = srgb_to_linear(DARK)
-    nt.links.new(rings.outputs["Fac"], ramp.inputs["Fac"])
+    nt.links.new(figure, ramp.inputs["Fac"])
 
     # darken into the knot itself
     kmix = nt.nodes.new("ShaderNodeMix")
@@ -407,7 +435,7 @@ def wood_material(name, length_axis, pith_d=0.110, warp=1.0, quarter=False):
     rough = nt.nodes.new("ShaderNodeMapRange")
     rough.inputs["To Min"].default_value = SPEC["rough"][0]
     rough.inputs["To Max"].default_value = SPEC["rough"][1]
-    nt.links.new(rings.outputs["Fac"], rough.inputs["Value"])
+    nt.links.new(figure, rough.inputs["Value"])
     nt.links.new(rough.outputs["Result"], bsdf.inputs["Roughness"])
     bsdf.inputs["Specular IOR Level"].default_value = 0.25
 
