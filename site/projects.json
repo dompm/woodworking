@@ -4,51 +4,6 @@
   "repository": "https://github.com/dompm/woodworking",
   "projects": [
     {
-      "slug": "travel-yahtzee",
-      "title": "Travel Yahtzee box",
-      "status": "Design",
-      "description": "A sliding-lid box for five dice, a mini mechanical pencil and a 4 \u00d7 6-inch scorepad.",
-      "material": "Baltic birch plywood",
-      "dimensions": "118 \u00d7 216 \u00d7 35 mm",
-      "hero": "renders/butt_open.png",
-      "guides": [
-        {
-          "file": "guide.html",
-          "title": "Box build guide"
-        },
-        {
-          "file": "router-table-guide.html",
-          "title": "Optional router table and finger joints"
-        }
-      ],
-      "notes": [
-        "The lid runs in grooves in the quarter-inch walls. Butt joints are the simple option; finger joints are an alternative.",
-        "The pencil compartment has a raised floor so the pencil is easier to pick up. Final fitting depends on the actual plywood, dice and pencil. A travel catch is still to be chosen."
-      ],
-      "views": [
-        {
-          "file": "renders/butt_closed.png",
-          "caption": "Closed box"
-        },
-        {
-          "file": "renders/butt_detail.png",
-          "caption": "Butt-joint corner"
-        },
-        {
-          "file": "renders/finger_open.png",
-          "caption": "Finger-joint alternative"
-        },
-        {
-          "file": "renders/guide_groove_section.svg",
-          "caption": "Lid groove section"
-        },
-        {
-          "file": "renders/butt_stage04.png",
-          "caption": "Dividers and pencil compartment"
-        }
-      ]
-    },
-    {
       "slug": "document-unit",
       "title": "Document unit",
       "status": "Built",

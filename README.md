@@ -6,7 +6,6 @@ Browse the [projects and build guides](https://woodworking.dominiquepiche.com/).
 
 | Project | Description | Status | Build notes |
 |---|---|---|---|
-| [Travel Yahtzee box](https://woodworking.dominiquepiche.com/projects/travel-yahtzee/) | A sliding-lid box for five dice, a mini mechanical pencil and a 4 × 6-inch scorepad. | Design | [Box build guide](https://woodworking.dominiquepiche.com/guides/travel-yahtzee/guide.html) · [Optional router table and finger joints](https://woodworking.dominiquepiche.com/guides/travel-yahtzee/router-table-guide.html) |
 | [Document unit](https://woodworking.dominiquepiche.com/projects/document-unit/) | A pine unit with ten compartments for letter and A4 folders. | Built | [Build guide](https://woodworking.dominiquepiche.com/guides/document-unit/guide.html) |
 | [Wine rack](https://woodworking.dominiquepiche.com/projects/wine-rack/) | A twelve-bottle rack with housed shelves and splayed legs. | Design | [Build guide](https://woodworking.dominiquepiche.com/guides/wine-rack/guide.html) |
 | [Salt boxes](https://woodworking.dominiquepiche.com/projects/salt-boxes/) | Two small hardwood boxes with pivoting lids, sized for MSG and sugar. | Design | [Build notes](https://woodworking.dominiquepiche.com/guides/salt-boxes/guide.html) |
