@@ -33,16 +33,13 @@ PIECE = sys.argv[1] if len(sys.argv) > 1 else "winerack"
 PIECES = {
     "winerack":  dict(open_w=4.0,  open_h=4.0,  rows=6, depth=9.00, legs=True,
                       title="Mid-century wine rack",
-                      lede="Twelve bottles in walnut or cherry, on splayed tapered "
-                           "legs. Written for a table saw, router, mitre saw and "
-                           "hand tools &mdash; and for someone whose last project "
-                           "was a picture frame.",
+                      lede="Build notes and drawings for a twelve-bottle rack "
+                           "in walnut or cherry, with splayed legs.",
                       stock="4/4 walnut, 9 in wide", hero="renders/beauty_walnut.png"),
     "documents": dict(open_w=12.0, open_h=3.5,  rows=5, depth=11.0, legs=False,
                       title="Document unit",
-                      lede="Ten cells for letter and A4 laid flat, in pine. The same "
-                           "joinery as the wine rack at a different scale &mdash; "
-                           "which is what makes it the right piece to build first.",
+                      lede="Build notes and drawings for a pine unit with ten "
+                           "compartments for letter and A4 folders.",
                       stock="1x12 pine, ripped to 11 in",
                       hero="renders/beauty_documents.png"),
 }
@@ -56,8 +53,8 @@ PROJECT = "document-unit" if DOCS else "wine-rack"
 # each project owns its renders/ the short names collide on purpose --
 # exploded.png exists for both pieces.  So: this piece first, then the wine rack
 # as the fallback (the joinery drawings were all made there), then lib for the
-# jigs.  The coffee table is deliberately absent; nothing here cites it, and
-# leaving it out keeps its beauty_walnut.png from shadowing the rack's.
+# jigs.  No unrelated project directories are searched, so a same-named render
+# from another project cannot shadow one of these guide assets.
 IMG_ROOTS = [
     "projects/%s/renders" % PROJECT,
     "projects/wine-rack/renders",
@@ -326,7 +323,7 @@ def svg_scandi_leg():
     o.append(f'<text class="lbl" x="{plan_x}" y="{plan_y-32}">PLAN AT THE TOP</text>')
     o.append(f'<text class="edge" x="{plan_x - 8}" y="{plan_y - 8}" text-anchor="end">'
              f'case corner</text>')
-    o.append(f'<circle cx="{plan_x}" cy="{plan_y}" r="4" fill="var(--brass)"/>')
+    o.append(f'<circle cx="{plan_x}" cy="{plan_y}" r="4" fill="var(--accent)"/>')
     # arrows on the two inner faces
     o.append(f'<path class="arrow" d="M {plan_x+top_w+26:.1f} {plan_y+top_w/2:.1f} '
              f'H {plan_x+top_w+5:.1f}"/>')
@@ -403,7 +400,7 @@ def svg_rip():
 
     # the cut line
     o.append(f'<line x1="{pad_l:.1f}" y1="{ycut:.1f}" x2="{pad_l+bw:.1f}" '
-             f'y2="{ycut:.1f}" style="stroke:var(--wine);stroke-width:2.2;'
+             f'y2="{ycut:.1f}" style="stroke:var(--warning);stroke-width:2.2;'
              f'stroke-dasharray:9 5"/>')
     o.append(f'<text class="warn" x="{pad_l+8:.1f}" y="{ycut-7:.1f}">'
              f'blade cuts here</text>')
@@ -411,7 +408,7 @@ def svg_rip():
     # the straightedge
     se_h = 11
     o.append(f'<rect x="{pad_l-6:.1f}" y="{yse:.1f}" width="{bw+12:.1f}" '
-             f'height="{se_h}" style="fill:var(--brass);fill-opacity:.55;'
+             f'height="{se_h}" style="fill:var(--accent);fill-opacity:.55;'
              f'stroke:var(--ink);stroke-opacity:.5;stroke-width:1"/>')
     o.append(f'<text class="lbl" x="{pad_l:.1f}" y="{yse+se_h+16:.1f}">'
              f'STRAIGHTEDGE</text>')
@@ -419,7 +416,7 @@ def svg_rip():
     # clamps at each end
     for cx in (pad_l + 26, pad_l + bw - 46):
         o.append(f'<rect x="{cx:.1f}" y="{yse-9:.1f}" width="20" height="{se_h+18}" '
-                 f'style="fill:var(--wine);fill-opacity:.85"/>')
+                 f'style="fill:var(--warning);fill-opacity:.85"/>')
     o.append(f'<text class="lbl" x="{pad_l+26:.1f}" y="{yse-16:.1f}">CLAMP</text>')
 
     # spacer sticks, reference edge -> straightedge
@@ -498,9 +495,9 @@ def svg_fit():
     different shelf thicknesses."""
     S, pw, gap, pad = 62.0, 210, 26, 22
     stile_t, hs = T * S, T * S
-    cases = [("too tight", +0.045, "var(--wine)", "splits the stile as you clamp"),
-             ("correct",    0.0,   "var(--brass)", "slides with hand pressure"),
-             ("too loose", -0.045, "var(--wine)", "a gap you will see forever")]
+    cases = [("too tight", +0.045, "var(--warning)", "splits the stile as you clamp"),
+             ("correct",    0.0,   "var(--accent)", "slides with hand pressure"),
+             ("too loose", -0.045, "var(--warning)", "a gap you will see forever")]
     hh = pad + 200 + 52
     o = [f'<svg viewBox="0 0 {pad*2 + 3*pw + 2*gap:.0f} {hh:.0f}" class="dwg" '
          f'role="img" aria-label="Housing fit: too tight, correct, too loose">']
@@ -545,17 +542,17 @@ def svg_clamping():
     # cauls, outside each stile
     for cx in (pad_l - 11, pad_l + cw + 3):
         o.append(f'<rect x="{cx:.1f}" y="{pad_t}" width="8" height="{ch:.1f}" '
-                 f'style="fill:var(--brass);fill-opacity:.5;stroke:var(--ink);'
+                 f'style="fill:var(--accent);fill-opacity:.5;stroke:var(--ink);'
                  f'stroke-opacity:.4;stroke-width:.8"/>')
     o.append(f'<text class="lbl" x="{pad_l-18}" y="{pad_t-10}" text-anchor="end">CAUL</text>')
     # a clamp at every housing
     for j in range(ROWS + 1):
         y = pad_t + ch - (hz(j) + T / 2) * S
         o.append(f'<line x1="{pad_l-34:.1f}" y1="{y:.1f}" x2="{pad_l+cw+34:.1f}" '
-                 f'y2="{y:.1f}" style="stroke:var(--wine);stroke-width:2.4"/>')
+                 f'y2="{y:.1f}" style="stroke:var(--warning);stroke-width:2.4"/>')
         for jx in (pad_l - 34, pad_l + cw + 26):
             o.append(f'<rect x="{jx:.1f}" y="{y-9:.1f}" width="8" height="18" '
-                     f'style="fill:var(--wine)"/>')
+                     f'style="fill:var(--warning)"/>')
     o.append(f'<text class="warn" x="{pad_l+cw+46:.1f}" y="{pad_t+ch/2:.1f}">'
              f'{ROWS+1} clamps, one per housing</text>')
     o.append(f'<text class="note" x="{pad_l}" y="{hh-24}">Snug, not crushing.</text>')
@@ -622,7 +619,7 @@ def svg_square():
     for x1, y1, x2, y2 in ((pad, pad, pad + cw, pad + ch),
                            (pad + cw, pad, pad, pad + ch)):
         o.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
-                 f'style="stroke:var(--wine);stroke-width:2;stroke-dasharray:7 5"/>')
+                 f'style="stroke:var(--warning);stroke-width:2;stroke-dasharray:7 5"/>')
     import math as _m
     diag = _m.hypot(W, H)
     o.append(f'<text class="warn" x="{pad+cw+14:.1f}" y="{pad+ch/2-6:.1f}">'
@@ -678,133 +675,70 @@ def svg_elevation():
 
 
 # ---------------------------------------------------------------- page
-CSS = """
-:root{
-  --paper:#F1EFEA; --surface:#FBFAF7; --ink:#1D1B18; --muted:#6B655C;
-  --rule:#DAD5CB; --brass:#8A6D26; --brass-soft:#EDE4CE; --wine:#7C2B36;
-  --wood:#C8A882; --cut:#A87F4C; --void:#E7E2D9; --shadow:rgba(29,27,24,.08);
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-  --serif:ui-serif,Charter,"Bitstream Charter","Iowan Old Style",Georgia,serif;
-  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme:dark){
-  :root{
-    --paper:#16171A; --surface:#1E2024; --ink:#E9E5DE; --muted:#9A968D;
-    --rule:#33363B; --brass:#C9A44E; --brass-soft:#2A2519; --wine:#D2707B;
-    --wood:#6A4E33; --cut:#93714A; --void:#24262A; --shadow:rgba(0,0,0,.4);
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#16171A; --surface:#1E2024; --ink:#E9E5DE; --muted:#9A968D;
-  --rule:#33363B; --brass:#C9A44E; --brass-soft:#2A2519; --wine:#D2707B;
-  --wood:#6A4E33; --cut:#93714A; --void:#24262A; --shadow:rgba(0,0,0,.4);
-}
-:root[data-theme="light"]{
-  --paper:#F1EFEA; --surface:#FBFAF7; --ink:#1D1B18; --muted:#6B655C;
-  --rule:#DAD5CB; --brass:#8A6D26; --brass-soft:#EDE4CE; --wine:#7C2B36;
-  --wood:#C8A882; --cut:#A87F4C; --void:#E7E2D9; --shadow:rgba(29,27,24,.08);
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);
-  font:400 17px/1.65 var(--serif);-webkit-font-smoothing:antialiased}
-.wrap{max-width:47rem;margin:0 auto;padding:0 1.35rem 6rem}
-h1,h2,h3,.eyebrow,.num-badge,th,.chip,.lede{font-family:var(--sans)}
-h1{font:700 clamp(2rem,6vw,2.9rem)/1.08 var(--sans);letter-spacing:-.025em;
-  margin:0 0 .5rem;text-wrap:balance}
-h2{font:650 1.32rem/1.3 var(--sans);letter-spacing:-.012em;margin:0;text-wrap:balance}
-h3{font:650 .95rem/1.4 var(--sans);letter-spacing:.01em;margin:2rem 0 .4rem}
-p{margin:0 0 1rem}
-a{color:var(--brass)}
-.eyebrow{font:600 .68rem/1 var(--sans);letter-spacing:.17em;text-transform:uppercase;
-  color:var(--brass);margin:0 0 1rem}
+SHARED_CSS = open(os.path.join(ROOT, "lib", "guide_style.css")).read()
+CSS = SHARED_CSS + """
+.wrap{max-width:960px;margin:0 auto;padding:30px 28px 90px}
+.eyebrow{letter-spacing:.17em;text-transform:uppercase;color:var(--accent)}
 header.top{padding:3.6rem 0 1.4rem}
-.lede{font:400 1.06rem/1.6 var(--sans);color:var(--muted);max-width:34rem;margin:0}
+.lede{color:var(--muted);max-width:34rem}
 .specs{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.6rem 0 0;padding:0;list-style:none}
 .chip{font:600 .72rem/1 var(--sans);letter-spacing:.04em;text-transform:uppercase;
   color:var(--muted);background:var(--surface);border:1px solid var(--rule);
   border-radius:2px;padding:.48rem .6rem}
 .chip b{color:var(--ink);font-variant-numeric:tabular-nums}
-figure{margin:1.8rem 0;padding:0}
-figure img,figure svg{display:block;width:100%;height:auto;border-radius:2px}
 figure svg.portrait{width:auto;max-width:100%;height:min(560px,72vh);margin-inline:auto}
 figure img{background:var(--surface);box-shadow:0 1px 3px var(--shadow)}
-figcaption{font:400 .85rem/1.5 var(--sans);color:var(--muted);margin-top:.6rem;
-  padding-left:.85rem;border-left:2px solid var(--brass)}
 .wide{margin-left:calc(-1*min(4.5rem,4vw));margin-right:calc(-1*min(4.5rem,4vw))}
-.dwg{background:var(--surface);border:1px solid var(--rule);padding:.4rem}
-.dwg .wp{fill:var(--wood);stroke:var(--ink);stroke-width:1.1;stroke-opacity:.55}
-.dwg .void{fill:var(--void);stroke:var(--ink);stroke-width:.8;stroke-opacity:.4}
-.dwg .cut{fill:var(--cut);stroke:var(--ink);stroke-width:.8;stroke-opacity:.5}
-.dwg .cut.end{fill:var(--brass);fill-opacity:.75}
-.dwg .leg{stroke:var(--ink);stroke-width:2.6;stroke-opacity:.6;stroke-linecap:round;fill:none}
-.dwg .dim,.dwg .tick{stroke:var(--brass);stroke-width:1;fill:none}
-.dwg .arrow{stroke:var(--wine);stroke-width:1.6;fill:none}
-.dwg text{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.dwg .num{font-size:11px;fill:var(--ink)}
-.dwg .lbl{font-size:10px;letter-spacing:.11em;fill:var(--brass)}
-.dwg .edge{font-size:9.5px;letter-spacing:.13em;fill:var(--muted)}
-.dwg .edge.front{fill:var(--wine)}
-.dwg .tpl{fill:var(--brass-soft);stroke:var(--ink);stroke-width:.9;stroke-opacity:.5}
-.dwg .rtr{fill:#41454b;stroke:none}
-.dwg .shank{fill:#9aa0a6;stroke:var(--ink);stroke-width:.6;stroke-opacity:.4}
-.dwg .cutter{fill:#8d949c;stroke:var(--ink);stroke-width:.7;stroke-opacity:.5}
-.dwg .bearing{fill:var(--wine);stroke:var(--ink);stroke-width:.7;stroke-opacity:.5}
-.dwg .warn{font-size:10.5px;fill:var(--wine)}
-.dwg .note{font-size:9.5px;fill:var(--muted)}
 .step{border-top:1px solid var(--rule);padding:2.6rem 0 .6rem;
   display:grid;grid-template-columns:3.1rem 1fr;gap:0 1rem;align-items:start}
-.num-badge{font:600 .78rem/1 var(--mono);letter-spacing:.04em;color:var(--brass);
-  background:var(--brass-soft);border-radius:2px;padding:.42rem .1rem;text-align:center;
+.num-badge{font:600 .78rem/1 var(--mono);letter-spacing:.04em;color:var(--accent);
+  background:var(--highlight-soft);border-radius:2px;padding:.42rem .1rem;text-align:center;
   font-variant-numeric:tabular-nums;margin-top:.2rem}
 .step-body>*:first-child{margin-top:0}
 .step-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.step-head h2{margin:0}
 .done{font:600 .68rem/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
   color:var(--muted);display:inline-flex;align-items:center;gap:.42rem;cursor:pointer;
   user-select:none;white-space:nowrap;flex:none}
-.done input{accent-color:var(--brass);width:1rem;height:1rem;cursor:pointer;margin:0}
+.done input{accent-color:var(--accent);width:1rem;height:1rem;cursor:pointer;margin:0}
 .step.is-done .step-body>:not(.step-head){opacity:.42}
 .step.is-done h2{text-decoration:line-through;text-decoration-color:var(--rule)}
 .callout{background:var(--surface);border:1px solid var(--rule);
-  border-left:3px solid var(--wine);border-radius:2px;padding:.9rem 1.05rem;margin:1.4rem 0}
+  border-left:3px solid var(--warning);border-radius:2px;padding:.9rem 1.05rem;margin:1.4rem 0}
 .callout p{margin:0}
 .callout .k{font:600 .68rem/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;
-  color:var(--wine);display:block;margin-bottom:.4rem}
+  color:var(--warning);display:block;margin-bottom:.4rem}
 .tablewrap{overflow-x:auto;margin:1.4rem 0}
-table{border-collapse:collapse;width:100%;font-size:.92rem}
-th,td{text-align:left;padding:.52rem .7rem;border-bottom:1px solid var(--rule)}
-th{font:600 .68rem/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;
-  color:var(--muted)}
 td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 tbody tr:last-child td{border-bottom:none}
 ul.tight{margin:0 0 1rem;padding-left:1.15rem}
+.wrap li{margin:0}
 ul.tight li{margin-bottom:.4rem}
+.specs li{margin:0}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.94em}
 .risks{counter-reset:r;list-style:none;padding:0;margin:1.4rem 0 0}
 .risks li{counter-increment:r;position:relative;padding-left:2.1rem;margin-bottom:1rem}
 .risks li::before{content:counter(r);position:absolute;left:0;top:.15rem;
-  font:600 .72rem/1 var(--mono);color:var(--wine);border:1px solid var(--wine);
+  font:600 .72rem/1 var(--mono);color:var(--warning);border:1px solid var(--warning);
   border-radius:50%;width:1.4rem;height:1.4rem;display:grid;place-items:center}
-footer{border-top:1px solid var(--rule);margin-top:3.4rem;padding-top:1.4rem;
-  font:400 .85rem/1.6 var(--sans);color:var(--muted)}
 @media (max-width:640px){
-  body{font-size:16px}
   .step{grid-template-columns:1fr;gap:.55rem}
   .num-badge{justify-self:start;padding:.36rem .6rem}
   .wide{margin-left:0;margin-right:0}
 }
 @media print{
-  body{background:#fff;color:#000;font-size:10.5pt}
-  .wrap{max-width:none}
+  .wrap{max-width:none;padding:0}
   .step{break-inside:avoid;page-break-inside:avoid}
   figure{break-inside:avoid}
   .done{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
 """
 
 JS = """
 (function(){
-  var KEY='winerack-guide-v1';
+  var KEY='cad-guide:' + window.location.pathname;
   var done={};
   try{done=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
   document.querySelectorAll('.step').forEach(function(step){
@@ -1013,8 +947,8 @@ the first is much easier to set up.</p>
 made to <b>exactly the cutter's diameter</b>. So the cut reproduces the template
 one-to-one, with no offset at all &mdash; which means the gap in your jig simply
 <em>is</em> the housing.</p>
-<div class="callout" style="border-left-color:var(--brass)">
-<span class="k" style="color:var(--brass)">Set it with the board itself</span>
+<div class="callout" style="border-left-color:var(--accent)">
+<span class="k" style="color:var(--accent)">Set it with the board itself</span>
 <p>Clamp the two rails against a piece of your actual shelf stock, tighten, pull the
 stock out. The jig now cuts a housing that fits that stock. No arithmetic, no router
 base diameter, nothing measured.</p></div>
@@ -1177,7 +1111,7 @@ rails land in a rabbet, so the outside of the case shows nothing but two continu
 vertical lines.</p>""")
 
     LEGS_SECTION = "" if DOCS else f"""<section class="step" style="border-top-width:2px">
-<div class="num-badge" style="color:var(--brass);background:transparent;border:1px solid var(--brass)">ALT</div>
+<div class="num-badge" style="color:var(--accent);background:transparent;border:1px solid var(--accent)">ALT</div>
 <div class="step-body">
 <h2>Variant &mdash; the Scandinavian legs</h2>
 <p>The mid-century version uses bought splayed legs on angled plates. The
@@ -1194,8 +1128,8 @@ isn't straight is obvious in a way a shelf isn't.</p>
 
 <h3>Cut the taper on the two INNER faces only</h3>
 {figure(svg_scandi_leg(), "The outer faces stay plumb and carry the line of the case sides down to the floor. Only the two faces looking into the case are tapered. All four legs are the same part, just rotated into their corners.", raster=False)}
-<div class="callout" style="border-left-color:var(--brass)">
-<span class="k" style="color:var(--brass)">Leave the top {frac(SQ_POST)}&Prime; square</span>
+<div class="callout" style="border-left-color:var(--accent)">
+<span class="k" style="color:var(--accent)">Leave the top {frac(SQ_POST)}&Prime; square</span>
 <p>The taper starts below a square post. That is not decoration &mdash; the glue
 blocks need a flat parallel face to sit against. Taper from the very top and the
 blocks meet a sloping face and leave a wedge-shaped gap.</p></div>
@@ -1225,8 +1159,12 @@ parallel to the floor</b>.</p>
 
     # Has to follow the piece: this is the browser tab, and it is the name the
     # published page carries around.  Both guides went out called "Wine Rack".
-    html = f"""<title>{P["title"]} &mdash; Shop Build Guide</title>
+    html = f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{P["title"]} &mdash; Shop Build Guide</title>
 <style>{CSS}</style>
+</head><body>
 <div class="wrap">
 <header class="top">
   <p class="eyebrow">Shop build guide</p>
@@ -1252,10 +1190,10 @@ parallel to the floor</b>.</p>
 {LEGS_SECTION}
 
 <section class="step" style="border-top-width:2px">
-<div class="num-badge" style="color:var(--wine);background:transparent;border:1px solid var(--wine)">!</div>
+<div class="num-badge" style="color:var(--warning);background:transparent;border:1px solid var(--warning)">!</div>
 <div class="step-body">
-<h2>The five things most likely to go wrong</h2>
-<p>None of these are skill problems. They are all preventable with setup.</p>
+<h2>Common setup problems</h2>
+<p>Check these points during dry assembly.</p>
 <ol class="risks">
 <li><b>Boards not all the same width.</b> Shelves sit proud or shy at the front. Fixed in
 step 2, nowhere else.</li>
@@ -1269,14 +1207,13 @@ right and the whole grid looks off. Step 7 &mdash; clamp them together.</li>
 </div></section>
 
 <footer>
-<p>Not a weekend. Milling and cutting to size is an evening; jigs and test joints another;
-the joinery is the bulk of it; then glue-up plus overnight, and finishing spread over a
-few days. Take the joinery slowly &mdash; everything else is forgiving and that part isn't.</p>
-<p>Every dimension on this page is generated from the CAD model, so the guide and the
-drawings can't drift apart.</p>
+<p>Allow separate sessions for preparing stock, making jigs, cutting joints,
+glue-up and finishing. Follow the glue and finish manufacturers' curing times.</p>
+<p>Check the current model and your material sizes before cutting.</p>
 </footer>
 </div>
 <script>{JS}</script>
+</body></html>
 """
     out = os.path.join(ROOT, "projects", PROJECT, "guide.html")
     with open(out, "w") as f:

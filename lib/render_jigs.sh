@@ -14,9 +14,9 @@ mkdir -p "$OUT"
 jig() {
   local name=$1 size=$2 camera=$3
   echo "  $name"
-  openscad -o "$OUT/${name}.png" --imgsize="$size" --projection=p $OPTS \
+  python3 "$DRAWING_LIB/render_drawing.py" --out "$OUT/${name}.png" --size "$size" -- --projection=p $OPTS \
            --camera="$(ecam "$camera")" -D 'mode="none"' -D "JIG=\"$name\"" \
-           "$S" >/dev/null 2>&1
+           "$S"
 }
 
 echo "rendering jigs"

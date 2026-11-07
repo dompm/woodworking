@@ -2,9 +2,8 @@
 Beauty render of a piece from this repo.
 
 Imports the per-part STLs written by lib/export_casework.scad (wine rack,
-document unit) or projects/coffee-table/export_parts.scad, builds a procedural
-wood shader (no external texture files), lights a small studio set and renders
-with Cycles.
+document unit), builds a procedural wood shader (no external texture files),
+uses the shared studio presentation, and renders with Cycles.
 
 --parts and --out are relative to the repo root, so a project's render_beauty.sh
 points them inside its own directory.  Normally you would run that script rather
@@ -14,20 +13,11 @@ than calling this directly.
         --parts projects/wine-rack/exports/parts --wood walnut \
         --out projects/wine-rack/renders/beauty_walnut.png --samples 256
 
-    /Applications/Blender.app/Contents/MacOS/Blender -b -P lib/scene.py -- \
-        --model table --parts projects/coffee-table/exports/parts \
-        --view table --res 2000x1300 \
-        --out projects/coffee-table/renders/beauty_walnut.png
-
 Grain runs along each board's own long axis, so there is one material per axis.
 The wine rack needs two: every carcass part has its 9" dimension front to back,
-so the rings always band across Y and only the length axis changes.  The coffee
-table needs all three -- the top and aprons are long in X, the breadboard ends
-and the shelf rails are long in Y, the legs in Z.
-
-The wine rack's defaults are untouched by the coffee table's arrival: --model
-defaults to winerack, and its light rig, part groups and camera views are the
-same numbers they always were.
+so the rings always band across Y and only the length axis changes. Bedside
+panels use their own X and Z directions to keep the grain aligned with each
+board.
 """
 import argparse
 import math
@@ -36,6 +26,9 @@ import sys
 
 import bpy
 from mathutils import Vector
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import render_style
 
 # --------------------------------------------------------------------------
 # args
@@ -49,14 +42,8 @@ ap.add_argument("--res", default="1400x1900")
 ap.add_argument("--parts", default="projects/wine-rack/exports/parts")
 ap.add_argument("--view", default="hero",
                 choices=["hero", "front", "detail", "wide",
-                         "table", "table_end", "table_detail",
                          "bedside_hero", "bedside_front", "bedside_detail"])
-ap.add_argument("--model", default="winerack", choices=["winerack", "table", "bedside"])
-# Ring scale multiplier.  The ring pitch that reads as walnut on a 9"-wide
-# carcass board turns into moire on a 1-3/4" leg: same physical pitch, far
-# fewer pixels across the part.  Coarser rings calm the legs down and, as a
-# bonus, put some contrast back into a big flat top that was reading as paint.
-ap.add_argument("--rings", type=float, default=1.0)
+ap.add_argument("--model", default="winerack", choices=["winerack", "bedside"])
 ap.add_argument("--bottles", default="1")
 ap.add_argument("--legs", default="wood", choices=["wood", "metal"])
 args = ap.parse_args(argv)
@@ -121,41 +108,7 @@ def srgb_to_linear(c):
 # --------------------------------------------------------------------------
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
-scene.render.engine = "CYCLES"
-scene.cycles.samples = args.samples
-scene.cycles.use_denoising = True
-scene.render.resolution_x = RES_X
-scene.render.resolution_y = RES_Y
-scene.render.film_transparent = False
-scene.render.image_settings.file_format = "PNG"
-
-# Metal GPU if this machine has one, otherwise CPU.
-try:
-    prefs = bpy.context.preferences.addons["cycles"].preferences
-    prefs.compute_device_type = "METAL"
-    prefs.get_devices()
-    for d in prefs.devices:
-        d.use = True
-    scene.cycles.device = "GPU"
-    print("cycles: GPU (metal)")
-except Exception as exc:  # pragma: no cover - depends on the machine
-    scene.cycles.device = "CPU"
-    print("cycles: CPU (%s)" % exc)
-
-# AgX desaturates bright values hard, which turns lit walnut into grey.
-# Prefer the product-viz transform, which holds saturation into the highlights.
-for vt in ("Khronos PBR Neutral", "Filmic", "AgX", "Standard"):
-    try:
-        scene.view_settings.view_transform = vt
-        print("view transform:", vt)
-        break
-    except Exception:
-        continue
-# A big horizontal top faces the lights squarely and blows out where the wine
-# rack's mostly vertical faces do not; half a stop down keeps the walnut brown
-# instead of tan.
-scene.view_settings.exposure = -0.35 if args.model in ("table", "bedside") else 0.0
-
+render_style.configure(scene, samples=max(64, args.samples), width=RES_X, height=RES_Y)
 
 # --------------------------------------------------------------------------
 # import
@@ -195,17 +148,6 @@ MODELS = {
             "glass": ["bottles"],
         },
         smooth={"leg0", "leg1", "leg2", "leg3", "brass", "bottles"},
-    ),
-    "table": dict(
-        groups={
-            # long in X: the top, both long rails, the shelf, the buttons
-            "wood_xq": ["top", "rail0", "rail1", "shelf", "buttons"],
-            # long in Y: the cross rails, and the loose tenons, whose grain runs
-            # along the joint the same way
-            "wood_y": ["xrail0", "xrail1", "tenons"],
-            "wood_zq": ["leg0", "leg1", "leg2", "leg3"],
-        },
-        smooth=set(),
     ),
     "bedside": dict(
         groups={
@@ -272,6 +214,7 @@ CX, CY = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
 TOP = max(zs)
 print("bounds  x %.3f..%.3f  y %.3f..%.3f  z %.3f..%.3f"
       % (min(xs), max(xs), min(ys), max(ys), min(zs), max(zs)))
+FULL_SCALE = max(max(xs) - min(xs), max(ys) - min(ys), max(zs) - min(zs)) / 0.22
 
 
 # --------------------------------------------------------------------------
@@ -436,7 +379,7 @@ def wood_material(name, length_axis, pith_d=0.110, warp=1.0, quarter=False):
     rings.wave_type = "RINGS"
     rings.rings_direction = axis
     rings.wave_profile = SPEC["profile"]
-    rings.inputs["Scale"].default_value = SPEC["rings"] * args.rings
+    rings.inputs["Scale"].default_value = SPEC["rings"]
     rings.inputs["Distortion"].default_value = 1.0
     rings.inputs["Detail"].default_value = 2.0
     rings.inputs["Detail Scale"].default_value = 0.8
@@ -541,12 +484,6 @@ MATS = {
     # the whole pattern, and 10 mm of it on a 1-3/4" face renders as a violent
     # chevron on one face while the face beside it stays perfectly straight.
     "wood_zq": wood_material("wood_zq", "Z", pith_d=0.90, warp=0.22),
-    # The coffee table's top is 21" wide where the wine rack's boards are 9".
-    # At the wine rack's pith distance the cathedrals get squeezed into tight
-    # parallel bands and the whole panel reads as corduroy; pushing the pith
-    # nearly four times further out gives long, lazy arcs instead -- broad in
-    # the middle of the board and closing up toward the edges, which is what a
-    # wide walnut top actually looks like.
     "wood_xq": wood_material("wood_xq", "X", pith_d=0.42),
     "brass": brass_material(),
     "steel": steel_material(),
@@ -562,74 +499,10 @@ for group, objs in imported.items():
 # --------------------------------------------------------------------------
 # set
 # --------------------------------------------------------------------------
-bpy.ops.mesh.primitive_plane_add(size=14, location=(CX, CY, 0))
-floor = bpy.context.object
-floor.name = "floor"
-fm, fnt, fb = new_mat("floor")
-fb.inputs["Base Color"].default_value = srgb_to_linear((0.30, 0.29, 0.275))
-fb.inputs["Roughness"].default_value = 0.55
-floor.data.materials.append(fm)
-
-world = bpy.data.worlds.new("world")
-scene.world = world
-world.use_nodes = True
-wnt = world.node_tree
-wnt.nodes.clear()
-wout = wnt.nodes.new("ShaderNodeOutputWorld")
-wbg = wnt.nodes.new("ShaderNodeBackground")
-wbg.inputs["Color"].default_value = (0.075, 0.080, 0.092, 1.0)
-wbg.inputs["Strength"].default_value = 1.6
-wnt.links.new(wbg.outputs["Background"], wout.inputs["Surface"])
-
-
-def area_light(name, loc, look_at, size, power, color=(1, 1, 1)):
-    d = bpy.data.lights.new(name, type="AREA")
-    d.size = size
-    d.energy = power
-    d.color = color
-    o = bpy.data.objects.new(name, d)
-    scene.collection.objects.link(o)
-    o.location = loc
-    direction = Vector(look_at) - Vector(loc)
-    o.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
-    return o
-
-
-# The rig is sized off the piece's own height, which works for the wine rack
-# (1.0 m tall and narrow) and fails completely for a coffee table: 0.66 of a
-# 0.39 m height puts the key light 26 cm off the floor, inside the piece.  A low
-# wide piece gets absolute heights and a wider spread instead, and more power to
-# pay for the extra distance.  SPREAD/SIZE/POWER are all 1 for the wine rack, so
-# its numbers are exactly what they were.
-if args.model == "table":
-    AIM_Z = TOP + 0.08
-    KEY_Z, FILL_Z, RIM_Z = 2.40, 1.90, 2.60
-    SPREAD, SIZE, POWER = 1.0, 2.0, 0.85
-elif args.model == "bedside":
-    AIM_Z = TOP * 0.52
-    KEY_Z, FILL_Z, RIM_Z = 1.65, 1.35, 1.75
-    SPREAD, SIZE, POWER = 1.0, 1.4, 0.90
-else:
-    AIM_Z = TOP * 0.46
-    KEY_Z, FILL_Z, RIM_Z = TOP * 0.66, TOP * 0.60, TOP * 0.70
-    SPREAD, SIZE, POWER = 1.0, 1.0, 1.0
-
-target = Vector((CX, CY, AIM_Z))
-area_light("key", (CX + 1.7 * SPREAD, CY - 2.2 * SPREAD, KEY_Z), target,
-           1.3 * SIZE, 150 * POWER, (1.0, 0.96, 0.90))
-area_light("fill", (CX - 2.1 * SPREAD, CY - 1.7 * SPREAD, FILL_Z), target,
-           1.2 * SIZE, 55 * POWER, (0.90, 0.94, 1.0))
-area_light("rim", (CX - 1.3 * SPREAD, CY + 2.1 * SPREAD, RIM_Z), target,
-           1.0 * SIZE, 80 * POWER, (1.0, 0.98, 0.95))
-
-# A coffee table or bedside cubby has interior/underside shadow from any normal viewpoint.
-if args.model == "table":
-    area_light("under", (CX + 0.5, CY - 2.2, 0.26),
-               Vector((CX, CY, 0.17)), 2.6, 90, (1.0, 0.96, 0.90))
-elif args.model == "bedside":
-    area_light("under", (CX + 0.3, CY - 1.8, 0.32),
-               Vector((CX, CY, 0.32)), 1.8, 65, (1.0, 0.96, 0.90))
-
+# Size the shared studio from the full assembly bounds. Keeping its origin at
+# the floor places every light above low, wide pieces as well as tall pieces.
+render_style.studio(scene, (CX, CY, TOP * 0.5), scale=FULL_SCALE,
+                    origin=(CX, CY, 0), floor_z=0)
 
 # --------------------------------------------------------------------------
 # camera
@@ -641,14 +514,6 @@ VIEWS = {
     "detail": (40, -4, 1.3, 85, 0.13),
     # for a wide, low case rather than a tall narrow one
     "wide":   (32, 12, 2.15, 70, 0.50),
-    # The coffee table: 1.27 m long and 0.39 m tall, so the camera has to be a
-    # long way back and only a little above the top.  Drop below about 12
-    # degrees of elevation and the shelf disappears behind the front apron.
-    "table":        (34, 15, 2.95, 60, 0.62),
-    "table_end":    (74, 13, 2.30, 70, 0.62),
-    # a sixth element shifts the aim point along the length, as a fraction of
-    # the half length -- the wine rack's views omit it and are unaffected
-    "table_detail": (46, 4, 1.00, 85, 0.44, -0.74, -0.55),
     # Bedside table: 0.53 m tall, 0.46 m wide
     "bedside_hero":   (32, 14, 1.95, 75, 0.52),
     "bedside_front":  (0, 8, 1.95, 80, 0.52),

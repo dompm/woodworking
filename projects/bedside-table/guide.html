@@ -1,0 +1,313 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bedside table — Build Guide</title><style>/* Shared guide presentation; embed this file in generated standalone pages. */
+:root {
+  color-scheme:light;
+  --paper:#f7f5f0;
+  --ink:#263635;
+  --muted:#596a65;
+  --rule:#cdd3cd;
+  --accent:#2b655e;
+  --surface:#e9ede6;
+  --wood:#c8a882;
+  --cut:#a87f4c;
+  --highlight-soft:#dce9e3;
+  --warning:#8a4b43;
+  --shadow:rgba(38,54,53,.08);
+  --sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --serif:ui-serif,Charter,"Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+* {
+  box-sizing:border-box;
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:17px/1.65 system-ui,-apple-system,sans-serif;
+}
+main {
+  max-width:960px;
+  padding:30px 28px 90px;
+  margin:auto;
+}
+nav {
+  display:flex;
+  gap:24px;
+  flex-wrap:wrap;
+  border-bottom:1px solid var(--rule);
+  padding-bottom:16px;
+  margin-bottom:40px;
+  font-size:15px;
+}
+h1 {
+  font-size:38px;
+  line-height:1.2;
+  letter-spacing:-1px;
+  margin:0 0 24px;
+}
+h2 {
+  font-size:28px;
+  line-height:1.25;
+  margin:64px 0 20px;
+}
+h3 {
+  font-size:22px;
+  line-height:1.3;
+  margin:46px 0 20px;
+}
+p {
+  margin:15px 0;
+}
+a {
+  color:var(--accent);
+  text-underline-offset:3px;
+}
+figure {
+  margin:26px 0 30px;
+}
+img {
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:5px;
+}
+figure svg {
+  display:block;
+  width:100%;
+  height:auto;
+}
+.step-body {
+  min-width:0;
+}
+figcaption {
+  font-size:14px;
+  line-height:1.5;
+  color:var(--muted);
+  margin-top:10px;
+}
+li {
+  margin:12px 0;
+}
+table {
+  border-collapse:collapse;
+  width:100%;
+  font-size:15px;
+}
+th,td {
+  padding:12px 14px;
+  text-align:left;
+  vertical-align:top;
+  border-bottom:1px solid var(--rule);
+}
+th {
+  font-weight:600;
+  background:var(--surface);
+}
+.table-wrap {
+  overflow-x:auto;
+  margin:24px 0;
+}
+code {
+  font-size:.88em;
+  background:var(--surface);
+  padding:2px 5px;
+  border-radius:3px;
+}
+pre {
+  overflow-x:auto;
+  background:var(--surface);
+  padding:20px;
+  border-radius:5px;
+}
+pre code {
+  padding:0;
+}
+footer {
+  border-top:1px solid var(--rule);
+  margin-top:60px;
+  padding-top:20px;
+  font-size:14px;
+  color:var(--muted);
+}
+@media(max-width:600px) {
+  main {
+    padding:22px 16px 60px;
+  }
+  h1 {
+    font-size:30px;
+  }
+  h2 {
+    font-size:25px;
+  }
+  h3 {
+    font-size:21px;
+  }
+  body {
+    font-size:16px;
+  }
+}
+@media print {
+  body {
+    background:white;
+    font-size:11pt;
+  }
+  main {
+    max-width:none;
+    padding:0;
+  }
+  nav,footer {
+    display:none;
+  }
+  pre {
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+  }
+  h2,h3 {
+    break-after:avoid;
+  }
+  figure,table {
+    break-inside:avoid;
+  }
+  figure {
+    max-width:650px;
+  }
+  a {
+    color:inherit;
+  }
+  img {
+    max-height:600px;
+    object-fit:contain;
+  }
+}
+
+/* Shared technical drawing language for inline shop diagrams. */
+.dwg { background:var(--surface); border:1px solid var(--rule); padding:.4rem; }
+.dwg .wp { fill:var(--wood); stroke:var(--ink); stroke-width:1.1; stroke-opacity:.55; }
+.dwg .void { fill:var(--paper); stroke:var(--ink); stroke-width:.8; stroke-opacity:.4; }
+.dwg .cut { fill:var(--cut); stroke:var(--ink); stroke-width:.8; stroke-opacity:.5; }
+.dwg .cut.end { fill:var(--accent); fill-opacity:.75; }
+.dwg .leg { stroke:var(--ink); stroke-width:2.6; stroke-opacity:.6; stroke-linecap:round; fill:none; }
+.dwg .dim,.dwg .tick { stroke:var(--accent); stroke-width:1; fill:none; }
+.dwg .arrow { stroke:var(--warning); stroke-width:1.6; fill:none; }
+.dwg text { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.dwg .num { font-size:11px; fill:var(--ink); }
+.dwg .lbl { font-size:10px; letter-spacing:.11em; fill:var(--accent); }
+.dwg .edge { font-size:9.5px; letter-spacing:.13em; fill:var(--muted); }
+.dwg .edge.front { fill:var(--warning); }
+.dwg .tpl { fill:var(--highlight-soft); stroke:var(--ink); stroke-width:.9; stroke-opacity:.5; }
+.dwg .rtr { fill:#41454b; stroke:none; }
+.dwg .shank { fill:#9aa0a6; stroke:var(--ink); stroke-width:.6; stroke-opacity:.4; }
+.dwg .cutter { fill:#8d949c; stroke:var(--ink); stroke-width:.7; stroke-opacity:.5; }
+.dwg .bearing { fill:var(--warning); stroke:var(--ink); stroke-width:.7; stroke-opacity:.5; }
+.dwg .warn { font-size:10.5px; fill:var(--warning); }
+.dwg .note { font-size:9.5px; fill:var(--muted); }
+</style></head><body><main><nav><a href="README.md">Project</a><a href="BUILD.md">Editable guide</a></nav><h1 id="bedside-table-build-guide">Bedside table — Build Guide</h1>
+<p>A clean, compact mid-century cubby nightstand in solid yellow birch on 14&quot; tapered steel legs. <strong>16&quot; W × 12&quot; D × 21&quot; H overall</strong>, sized to sit flush and level with an IKEA MALM bed and nightstand setup.</p>
+<figure><a href="renders/beauty_yellow_birch.png"><img src="renders/beauty_yellow_birch.png" alt="Cycles beauty render" loading="lazy"></a><figcaption>Cycles beauty render</figcaption></figure>
+<hr>
+<h2 id="0-cut-list-stock-sourcing">0. Cut List &amp; Stock Sourcing</h2>
+<h3 id="finished-dimensions-of-the-4-boards-rabbet-joinery">Finished Dimensions of the 4 Boards (Rabbet Joinery)</h3>
+<p>All boards are <strong>3/4&quot; (0.75&quot;) thick</strong> solid yellow birch planed flat:</p>
+<div class="table-wrap"><table><thead><tr><th>Component</th><th>Quantity</th><th>Finished Size (L × W × T)</th><th>Joinery Details</th></tr></thead><tbody>
+<tr><td><strong>Top Board</strong></td><td>1</td><td><strong>16.00&quot; × 12.00&quot; × 0.75&quot;</strong></td><td>3/8&quot; deep × 3/4&quot; wide rabbet on inside face at both ends</td></tr>
+<tr><td><strong>Bottom Board</strong></td><td>1</td><td><strong>16.00&quot; × 12.00&quot; × 0.75&quot;</strong></td><td>3/8&quot; deep × 3/4&quot; wide rabbet on inside face at both ends</td></tr>
+<tr><td><strong>Side Panels (2)</strong></td><td>2</td><td><strong>6.25&quot; × 12.00&quot; × 0.75&quot;</strong></td><td>Clean square 90° crosscuts; nest into the top &amp; bottom rabbets</td></tr>
+</tbody></table></div>
+<ul>
+<li><strong>Clear Internal Cubby Opening</strong>: 14.50&quot; W × 5.50&quot; H × 12.00&quot; D.</li>
+<li><strong>Overall Height on 14&quot; Legs</strong>: 21.00&quot; nominal (level with MALM mattress line).</li>
+</ul>
+<h3 id="lumber-sourcing">Lumber Sourcing</h3>
+<p>Total board length needed: <code>16 + 16 + 6.25 + 6.25 = 44.5&quot;</code> (~3.7 linear feet).</p>
+<ul>
+<li><strong>Lumber</strong>: One 4-foot to 5-foot board of 4/4 Yellow Birch surfaced to 12&quot; wide (or edge-glued from two 6-1/2&quot; boards).</li>
+<li><strong>Surfacing</strong>: S2S to 3/4&quot; thickness with one straight-line ripped edge (SLR1E).</li>
+</ul>
+<hr>
+<h2 id="1-hardware-tools-consumables">1. Hardware, Tools &amp; Consumables</h2>
+<h3 id="hardware">Hardware</h3>
+<ul>
+<li><strong>Legs</strong>: 4 × <strong>14&quot; mid-century tapered steel legs</strong> (KaizeooHaus or similar) with angled mounting plates and threaded floor leveler glides.</li>
+<li><strong>Screws</strong>: 16 × <strong>#8 × 5/8&quot; pan-head wood screws</strong> (short enough not to poke through the 3/4&quot; bottom board).</li>
+</ul>
+<h3 id="shop-tools-used">Shop Tools Used</h3>
+<ul>
+<li><strong>Circular saw (or mitre saw) + straight edge</strong>: For clean 90° crosscuts to size the 4 boards.</li>
+<li><strong>Mastercraft 2 HP Plunge Router</strong>: For cutting the four 3/8&quot; deep × 3/4&quot; wide rabbets. - Bit: Standard 1/2&quot; or 3/4&quot; straight carbide router bit. - Guide: Clamped straight edge / level offset by router base radius.</li>
+<li><strong>Clamps</strong>: 2 to 4 pipe clamps or 24&quot; F-clamps for vertical clamping; 1 clamp across width for seating against rabbet shoulder.</li>
+<li><strong>Drill / Driver</strong>: DeWALT 20V with 3/32&quot; pilot drill bit and driver bit.</li>
+<li><strong>Measuring</strong>: Tape measure, combination square, digital caliper, pencil.</li>
+</ul>
+<h3 id="consumables">Consumables</h3>
+<ul>
+<li><strong>Glue</strong>: Titebond II (standard PVA wood glue).</li>
+<li><strong>Abrasives</strong>: 120, 180, and 220 grit sandpaper + sanding block.</li>
+<li><strong>Finish</strong>: Hardwax oil (Osmo Polyx-Oil 3043 satin) or Danish oil.</li>
+</ul>
+<hr>
+<h2 id="2-step-by-step-order-of-work">2. Step-by-Step Order of Work</h2>
+<h3 id="step-1-crosscut-the-4-boards-to-length">Step 1 — Crosscut the 4 Boards to Length</h3>
+<ol>
+<li>Square one end of the 12&quot;-wide birch board with your circular saw against the clamped straight edge.</li>
+<li>Cut the <strong>Top</strong> board to exactly <strong>16.00&quot;</strong>.</li>
+<li>Cut the <strong>Bottom</strong> board to exactly <strong>16.00&quot;</strong> (clamp Top and Bottom together to verify identical length).</li>
+<li>Cut the two <strong>Side</strong> panels to exactly <strong>6.25&quot;</strong> (6-1/4&quot;).</li>
+</ol>
+<hr>
+<h3 id="step-2-route-the-3-8-rabbets-on-top-bottom-panels">Step 2 — Route the 3/8&quot; Rabbets on Top &amp; Bottom Panels</h3>
+<pre><code>      OUTSIDE FACE (16&quot; Top Board)
++──────────────────────────────────────────+
+│                                          │
+└───┐                                  ┌───┘
+ 3/8&quot;│ 3/4&quot;                      3/4&quot;  │3/8&quot;
+     +─────────────────────────────────+
+                 INSIDE FACE</code></pre>
+<ol>
+<li><strong>Secure the workpiece</strong>: Clamp the Top board flat to your workbench, inside face pointing up.</li>
+<li><strong>Set the router guide</strong>: - Chuck a 1/2&quot; or 3/4&quot; straight carbide bit in your plunge router. - Measure the exact distance from the edge of your router&#x27;s sub-base to the cutting edge of the bit. - Clamp your straight-edge guide parallel to the end of the board so the bit routes exactly <strong>3/4&quot; wide</strong> from the end.</li>
+<li><strong>Make 2 shallow depth passes</strong>: - *Pass 1*: Set plunge depth to <strong>3/16&quot;</strong> (half depth). Make a steady, smooth pass across the 12&quot; width. - *Pass 2*: Plunge to the final <strong>3/8&quot; (0.375&quot;)</strong> depth. Make the final cleaning pass.</li>
+<li>Repeat for the other end of the Top board, and both ends of the Bottom board (4 rabbets total).</li>
+<li><strong>Dry fit</strong>: Slip a 6-1/4&quot; side panel into the rabbet recess. It should seat dead-flat against the shoulder with the outer faces perfectly flush.</li>
+</ol>
+<hr>
+<h3 id="step-3-edge-treatment-eased-arrises-vs-chamfers">Step 3 — Edge Treatment: Eased Arrises vs Chamfers</h3>
+<p>&gt; [!TIP] Why Eased Edges Beat Chamfers on Rabbet Casework &gt; On a 45° miter, a chamfer works because the joint seam is dead-center on the 45° corner. &gt; On a rabbet joint, however, the joint seam is located 3/8&quot; down the side face. A 45° router &gt; chamfer on the corner cuts across the joint at an offset and visually clashes with the joinery. &gt; &gt; <strong>The Scandinavian / Japandi standard</strong>: &gt; - Keep all outer planar corners square. &gt; - Hand-ease the arrises with a sanding block loaded with 220-grit paper (a subtle ~1/32&quot; softening). &gt; - This feels silky and pleasant in hand while keeping the architectural lines clean and pure. &gt; - *(Optional)*: If you want to use your chamfer bit, run a light 1/8&quot; chamfer ONLY around the &gt;   *inside* opening rim (where hands reach into the cubby).</p>
+<hr>
+<h3 id="step-4-pre-finish-the-interior-shop-secret">Step 4 — Pre-Finish the Interior (Shop Secret)</h3>
+<ol>
+<li>Sand the <strong>inside faces</strong> of all 4 boards to 180 and 220 grit.</li>
+<li>Apply one coat of Osmo Polyx-Oil or finish to the inside faces only.</li>
+<li>Keep the finish <strong>1/4&quot; away from the rabbet gluing faces</strong> (mask with painter&#x27;s tape).</li>
+<li>Any glue squeeze-out during assembly will not adhere to the finished wood and pops right off with a damp cloth!</li>
+</ol>
+<hr>
+<h3 id="step-5-glue-up-clamping">Step 5 — Glue-Up &amp; Clamping</h3>
+<p>Unlike miters, rabbet joints are <strong>self-squaring</strong>: the 3/8&quot; internal shoulder mechanically traps the side panels square under clamp pressure.</p>
+<ol>
+<li>Lay the Bottom board flat on the bench, rabbet pockets facing up.</li>
+<li>Spread PVA glue (Titebond II) evenly along the rabbet shelves and shoulders.</li>
+<li>Place the two 6-1/4&quot; side panels upright into the bottom rabbets.</li>
+<li>Apply glue to the top ends of the side panels and top rabbets, then place the Top board on.</li>
+<li><strong>Apply clamping pressure</strong>: - Place 2 to 3 bar/pipe clamps vertically across the carcass (pressing Top and Bottom into the sides). - Snug the clamps gently. Check for square with your combination square (the rabbets should automatically align it). - If needed, place 1 clamp horizontally across the width to snug the sides against the internal shoulders. - Tighten clamps firmly. Wipe off any squeezed-out glue.</li>
+<li>Leave in clamps for <strong>1 to 2 hours</strong>.</li>
+</ol>
+<hr>
+<h3 id="step-6-final-sanding-finishing">Step 6 — Final Sanding &amp; Finishing</h3>
+<ol>
+<li>Once fully cured, unclamp the box.</li>
+<li>Sand the exterior faces flush: - Start with 120 grit on a random orbital sander (or sanding block) to ensure the 3/8&quot; top/bottom lips are flush with the sides. - Progress through 180 and 220 grit across all faces.</li>
+<li>Hand-ease all edges with 220-grit paper on a cork/rubber sanding block.</li>
+<li>Clean off all dust.</li>
+<li>Apply 2 thin coats of Osmo Polyx-Oil 3043 (or Danish oil), buffing between coats with 0000 steel wool or a maroon Scotch-Brite pad.</li>
+</ol>
+<hr>
+<h3 id="step-7-leg-installation">Step 7 — Leg Installation</h3>
+<ol>
+<li>Flip the finished box upside down onto a soft blanket.</li>
+<li>Position the 4 mounting plates inset <strong>1.75&quot; from each outer edge</strong>.</li>
+<li>Align the angled legs so they lean outward symmetrically toward each of the 4 corners.</li>
+<li>Mark the 16 screw holes.</li>
+<li>Drill pilot holes using a 3/32&quot; drill bit with tape wrapped at 1/2&quot; depth (to prevent drilling through).</li>
+<li>Drive the #8 × 5/8&quot; screws securely.</li>
+<li>Flip upright onto its brass leveler feet. Adjust the threaded brass glides to level the table perfectly beside the bed.</li>
+</ol><footer>Images open at full size when selected. Generated from the editable Markdown guide.</footer></main></body></html>

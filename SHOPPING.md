@@ -261,30 +261,6 @@ the rails from the 3/4" MDF already on hand.
 
 
 
-### Footrest ([projects/footrest](projects/footrest/))
-
-- [ ] **Walnut or poplar** — one board at least 11" wide × 17" long, plus
-  ```
-  sides. About 2-1/2 board feet. **Ask what width they actually stock
-  before committing to the design** — under 11" and the depth has to come
-  down.
-  ```
-- [ ] **1/4" roundover bit** — the generous soft edge is most of what makes it
-  ```
-  read as furniture
-  ```
-- [ ] **Navy felt**, 13" × 4", plus spray adhesive
-- [ ] **Non-slip pads** — rubber or cork, not felt. A brace that slides across
-  ```
-  the floor solves nothing.
-  ```
-- [ ] Gel stain or dye if going the poplar route — **not** a pigment stain,
-  ```
-  which blotches badly on poplar
-  ```
-
-
-
 ### Salt boxes ([projects/salt-boxes](projects/salt-boxes/))
 
 - [ ] **Hardwood, about a foot of 4/4** — everything is 3/4" so it's one board.

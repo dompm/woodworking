@@ -1,104 +1,56 @@
 # Woodworking
 
-Furniture I'm building, designed before it's cut. Each piece is a parametric
-OpenSCAD model, and everything downstream — the shop drawings, the jig models,
-the cut lists, the photoreal renders and the illustrated build guides — is
-generated from that model, so none of it can drift from the design.
+Models, drawings and build notes for my woodworking projects.
 
-| | | |
-|---|---|---|
-| **[Document unit](projects/document-unit/)** | 10 cells for letter and A4 laid flat, in pine. 26-1/4 × 11 × 22. | **built** · [guide](https://claude.ai/code/artifact/87fcd98c-7703-488a-8ec8-152ccdd2b3c9) |
-| **[Wine rack](projects/wine-rack/)** | 12 bottles in walnut, on splayed tapered legs. 10-1/4 × 9 × 39-1/2. | the real one · [guide](https://claude.ai/code/artifact/a3f2afa2-34b5-4bcf-a35a-0f884b502578) |
-| **[Footrest](projects/footrest/)** | Solid ramp on splayed sides, felt inset. 17 × 10-7/16 × 6-1/4. | a brace, not a platform |
-| **[Salt boxes](projects/salt-boxes/)** | A pair in hardwood, swivelling lids. 3-1/4 sq. | MSG and sugar |
-| **[Bedside table](projects/bedside-table/)** | 16 × 12 × 21 in yellow birch on 14" tapered steel legs. | self-squaring rabbets, open cubby |
+| Project | Description | Status | Build notes |
+|---|---|---|---|
+| [Travel Yahtzee box](projects/travel-yahtzee/) | A sliding-lid box for five dice, a mini mechanical pencil and a 4 × 6-inch scorepad. | Design | [Guide](projects/travel-yahtzee/guide.html) |
+| [Document unit](projects/document-unit/) | A pine unit with ten compartments for letter and A4 folders. | Built | [Guide](projects/document-unit/guide.html) |
+| [Wine rack](projects/wine-rack/) | A twelve-bottle rack with housed shelves and splayed legs. | Design | [Guide](projects/wine-rack/guide.html) |
+| [Salt boxes](projects/salt-boxes/) | Two small hardwood boxes with pivoting lids, sized for MSG and sugar. | Design | [Guide](projects/salt-boxes/guide.html) |
+| [Bedside table](projects/bedside-table/) | An open birch cubby on tapered steel legs. | Design | [Guide](projects/bedside-table/guide.html) |
 
-| Kitchen | Closet |
-| :---: | :---: |
-| ![Document unit in kitchen](projects/document-unit/photos/built-kitchen.jpg) | ![Document unit in closet](projects/document-unit/photos/built-closet.jpg) |
+## Website
 
-![Walnut wine rack](projects/wine-rack/renders/beauty_walnut.png)
-
-The document unit and the wine rack are **the same model** — one parametric
-cell-grid case in [`lib/casework.scad`](lib/casework.scad), with the cell
-proportions and the legs switched by parameter. That is deliberate: the
-document unit is a full rehearsal of the wine rack's joinery at a more
-forgiving scale and in cheaper wood, and building it teaches the real piece.
-
-## Layout
-
-```
-lib/         shared across every project
-projects/    one directory per piece
-TOOLS.md     what's in the shop, and what each tool takes in consumables
-JIGS.md      the shop jigs: cutting layout, build order, and why each number
-SHOPPING.md  what still needs buying, with the specs that are easy to get wrong
-```
-
-`lib/` is the part that gets reused. The wood shader, the jig models and the
-guide generator have nothing to do with any particular piece of furniture.
-
-| | |
-|---|---|
-| `lib/casework.scad` | the parametric cell-grid case — wine rack *and* document unit |
-| `lib/jigs.scad` | the shop jigs, drawn so they can be seen rather than imagined |
-| `lib/export_casework.scad` | writes one STL per board, for the renderer |
-| `lib/scene.py` | the Cycles scene: procedural wood, studio lights |
-| `lib/guide.py` | builds the illustrated shop guides |
-| `lib/cameras.sh` | camera helpers — every camera in this repo is written in inches |
-| `lib/render_jigs.sh` | renders the jig drawings both guides pull from |
-
-Each project directory holds its own model or preset, its docs, its
-`render.sh` / `render_beauty.sh`, and its own `renders/` and `exports/`.
-Run the scripts from anywhere; they locate the repo root themselves.
-
-The coffee table keeps its model in its own directory rather than in `lib/`,
-because nothing else uses it. `casework.scad` is in `lib/` because two projects
-do.
-
-## Requirements
+The static website is built from `site/projects.json` and the project files.
+The same catalog supplies the project list above. Edit `site/readme.md.in` for
+the rest of this README.
 
 ```sh
-brew install --cask openscad   # working drawings, meshes, jig drawings
-brew install --cask blender    # photoreal renders only (optional)
-pip install pillow             # the guide generator inlines its images
+python3 site/build.py
+python3 -m http.server 8000 --directory site/dist
 ```
 
-Nothing else. The wood shader is procedural, so there are no texture files to
-download, and every drawing is generated rather than drawn.
+Open [localhost:8000](http://localhost:8000) to preview it. Upload the contents
+of `site/dist/` to a static web host to publish it. The intended address is
+[woodworking.dominiquepiche.com](https://woodworking.dominiquepiche.com/).
 
-## Regenerating everything
+## Files
+
+- `projects/`: models, renders, build notes and generated guides for each project.
+- `lib/`: shared models, rendering tools and guide styles.
+- [TOOLS.md](TOOLS.md): shop tools and accessories.
+- [JIGS.md](JIGS.md): jig designs and setup notes.
+- [SHOPPING.md](SHOPPING.md): materials and tools still to buy.
+
+The document unit and wine rack use the same casework model with different
+parameters. The other projects have their own models.
+
+## Generating drawings and guides
+
+OpenSCAD generates the working views and meshes. Blender generates the studio
+renders. Python and Pillow are used for publication images, guides and the site.
 
 ```sh
-projects/wine-rack/render.sh          # OpenSCAD views + STL/3MF   (seconds)
-projects/wine-rack/render_beauty.sh   # per-part STLs + Cycles     (minutes)
-lib/render_jigs.sh                    # the shared jig drawings
-python3 lib/guide.py                  # -> projects/wine-rack/guide.html
-python3 lib/guide.py documents        # -> projects/document-unit/guide.html
+brew install --cask openscad blender
+python3 -m pip install pillow
+
+projects/wine-rack/render.sh
+projects/wine-rack/render_beauty.sh
+lib/render_jigs.sh
+python3 lib/build_guides.py
 ```
 
-### Units
-
-The design math is in inches, but every model is scaled by `UNIT = 25.4` on
-output, so the scene OpenSCAD draws is in millimetres. This matters: a 40-unit
-tall object sits right on OpenSCAD's near clip plane, which is what makes the
-view clip when you zoom in and makes the mouse feel hair-trigger. At mm scale
-the object is ~1000 units and navigates normally.
-
-Set `UNIT = 1` for exports in inches — the render scripts scale their camera
-positions by the same factor, so they follow automatically.
-
-### Beauty renders
-
-The wood is fully procedural — no texture files — so it renders anywhere with
-nothing to download. Growth rings are built as concentric cylinders about a
-pith axis outside the board, so cathedral figure is *derived* from where the
-board sits in the log rather than faked. Each board is imported as its own
-object and the shader offsets it by `Object Info > Random`, anisotropically
-(metres along the grain, ±15 mm across it) so no two boards match without
-moving the pith itself.
-
-Species live in `WOODS` at the top of [`lib/scene.py`](lib/scene.py): a ring
-`profile` (`SAW` for softwoods — gradual earlywood, abrupt boundary; `SIN` for
-diffuse-porous hardwoods), a colour pair, and a knot density. Add one and it
-becomes a `--wood` choice.
+Each project contains its own generation scripts. Design dimensions are in
+inches unless noted; the OpenSCAD models export millimetres by default.
+Check stock thickness and fit before using a generated cut list.

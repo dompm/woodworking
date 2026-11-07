@@ -35,8 +35,7 @@ b() { # b <view> <res> <out>
   echo "rendering Cycles beauty ($view)"
   "$BLENDER" -b -P lib/scene.py -- \
     --model bedside --parts "$PARTS" --wood yellow_birch \
-    --view "$view" --res "$res" --samples "$SAMPLES" --out "$out" \
-    2>&1 | grep -E 'Saved|Error' || true
+    --view "$view" --res "$res" --samples "$SAMPLES" --out "$out"
 }
 
 b bedside_hero  "$RES" "$OUT/beauty_yellow_birch.png"
