@@ -1,0 +1,253 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Salt boxes — laminated hardwood, swivelling lid</title><style>/* Shared guide presentation; embed this file in generated standalone pages. */
+:root {
+  color-scheme:light;
+  --paper:#f7f5f0;
+  --ink:#263635;
+  --muted:#596a65;
+  --rule:#cdd3cd;
+  --accent:#2b655e;
+  --surface:#e9ede6;
+  --wood:#c8a882;
+  --cut:#a87f4c;
+  --highlight-soft:#dce9e3;
+  --warning:#8a4b43;
+  --shadow:rgba(38,54,53,.08);
+  --sans:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --serif:ui-serif,Charter,"Bitstream Charter","Iowan Old Style",Georgia,serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+}
+* {
+  box-sizing:border-box;
+}
+body {
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:17px/1.65 system-ui,-apple-system,sans-serif;
+}
+main {
+  max-width:960px;
+  padding:30px 28px 90px;
+  margin:auto;
+}
+nav {
+  display:flex;
+  gap:24px;
+  flex-wrap:wrap;
+  border-bottom:1px solid var(--rule);
+  padding-bottom:16px;
+  margin-bottom:40px;
+  font-size:15px;
+}
+h1 {
+  font-size:38px;
+  line-height:1.2;
+  letter-spacing:-1px;
+  margin:0 0 24px;
+}
+h2 {
+  font-size:28px;
+  line-height:1.25;
+  margin:64px 0 20px;
+}
+h3 {
+  font-size:22px;
+  line-height:1.3;
+  margin:46px 0 20px;
+}
+p {
+  margin:15px 0;
+}
+a {
+  color:var(--accent);
+  text-underline-offset:3px;
+}
+figure {
+  margin:26px 0 30px;
+}
+img {
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:5px;
+}
+figure svg {
+  display:block;
+  width:100%;
+  height:auto;
+}
+.step-body {
+  min-width:0;
+}
+figcaption {
+  font-size:14px;
+  line-height:1.5;
+  color:var(--muted);
+  margin-top:10px;
+}
+li {
+  margin:12px 0;
+}
+table {
+  border-collapse:collapse;
+  width:100%;
+  font-size:15px;
+}
+th,td {
+  padding:12px 14px;
+  text-align:left;
+  vertical-align:top;
+  border-bottom:1px solid var(--rule);
+}
+th {
+  font-weight:600;
+  background:var(--surface);
+}
+.table-wrap {
+  overflow-x:auto;
+  margin:24px 0;
+}
+code {
+  font-size:.88em;
+  background:var(--surface);
+  padding:2px 5px;
+  border-radius:3px;
+}
+pre {
+  overflow-x:auto;
+  background:var(--surface);
+  padding:20px;
+  border-radius:5px;
+}
+pre code {
+  padding:0;
+}
+footer {
+  border-top:1px solid var(--rule);
+  margin-top:60px;
+  padding-top:20px;
+  font-size:14px;
+  color:var(--muted);
+}
+@media(max-width:600px) {
+  main {
+    padding:22px 16px 60px;
+  }
+  h1 {
+    font-size:30px;
+  }
+  h2 {
+    font-size:25px;
+  }
+  h3 {
+    font-size:21px;
+  }
+  body {
+    font-size:16px;
+  }
+}
+@media print {
+  body {
+    background:white;
+    font-size:11pt;
+  }
+  main {
+    max-width:none;
+    padding:0;
+  }
+  nav,footer {
+    display:none;
+  }
+  pre {
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+  }
+  h2,h3 {
+    break-after:avoid;
+  }
+  figure,table {
+    break-inside:avoid;
+  }
+  figure {
+    max-width:650px;
+  }
+  a {
+    color:inherit;
+  }
+  img {
+    max-height:600px;
+    object-fit:contain;
+  }
+}
+
+/* Shared technical drawing language for inline shop diagrams. */
+.dwg { background:var(--surface); border:1px solid var(--rule); padding:.4rem; }
+.dwg .wp { fill:var(--wood); stroke:var(--ink); stroke-width:1.1; stroke-opacity:.55; }
+.dwg .void { fill:var(--paper); stroke:var(--ink); stroke-width:.8; stroke-opacity:.4; }
+.dwg .cut { fill:var(--cut); stroke:var(--ink); stroke-width:.8; stroke-opacity:.5; }
+.dwg .cut.end { fill:var(--accent); fill-opacity:.75; }
+.dwg .leg { stroke:var(--ink); stroke-width:2.6; stroke-opacity:.6; stroke-linecap:round; fill:none; }
+.dwg .dim,.dwg .tick { stroke:var(--accent); stroke-width:1; fill:none; }
+.dwg .arrow { stroke:var(--warning); stroke-width:1.6; fill:none; }
+.dwg text { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.dwg .num { font-size:11px; fill:var(--ink); }
+.dwg .lbl { font-size:10px; letter-spacing:.11em; fill:var(--accent); }
+.dwg .edge { font-size:9.5px; letter-spacing:.13em; fill:var(--muted); }
+.dwg .edge.front { fill:var(--warning); }
+.dwg .tpl { fill:var(--highlight-soft); stroke:var(--ink); stroke-width:.9; stroke-opacity:.5; }
+.dwg .rtr { fill:#41454b; stroke:none; }
+.dwg .shank { fill:#9aa0a6; stroke:var(--ink); stroke-width:.6; stroke-opacity:.4; }
+.dwg .cutter { fill:#8d949c; stroke:var(--ink); stroke-width:.7; stroke-opacity:.5; }
+.dwg .bearing { fill:var(--warning); stroke:var(--ink); stroke-width:.7; stroke-opacity:.5; }
+.dwg .warn { font-size:10.5px; fill:var(--warning); }
+.dwg .note { font-size:9.5px; fill:var(--muted); }
+</style></head><body><main><nav><a href="README.md">Project</a><a href="README.md">Editable guide</a></nav><h1 id="salt-boxes-laminated-hardwood-swivelling-lid">Salt boxes — laminated hardwood, swivelling lid</h1>
+<p>A pair. <strong>3-1/4&quot; square</strong>, differing only in height. Stack-laminated from hardwood offcuts, with generously rounded corners and a lid that pivots on a brass screw.</p>
+<figure><a href="renders/L2_open.png"><img src="renders/L2_open.png" alt="Open" loading="lazy"></a><figcaption>Open</figcaption></figure>
+<div class="table-wrap"><table><thead><tr><th></th><th>MSG</th><th>Sugar</th></tr></thead><tbody>
+<tr><td>Middle layers</td><td>2</td><td>3</td></tr>
+<tr><td>Height</td><td>3&quot;</td><td>3-3/4&quot;</td></tr>
+<tr><td>Cavity</td><td>2-1/4&quot; sq × 1-1/2&quot; deep</td><td>2-1/4&quot; sq × 2-1/4&quot; deep</td></tr>
+<tr><td>Holds</td><td>~123 ml (1/2 cup)</td><td>~185 ml (3/4 cup)</td></tr>
+</tbody></table></div>
+<p><strong>The height difference is the label</strong> — reaching for the wrong one mid-cook is the failure mode a matched pair guarantees.</p>
+<h2 id="the-proportions">The proportions</h2>
+<p>The first version had a 2-1/2&quot; × 3/4&quot; cavity, which is a tray, not a well. A powder spread that thin is something you scrape at rather than pinch. <strong>Same volume, three times the depth</strong> is the fix: narrower footprint, more layers.</p>
+<h2 id="corners">Corners</h2>
+<p><strong>Outside: 1/2&quot; radius</strong>, which is generous on purpose. A small ease on an object this size just gives you a slightly less sharp box; at 1/2&quot; the corners become quarter-cylinders and the silhouette changes. This is also the edge your hand meets several times a day, which is why it&#x27;s rounded rather than chamfered — a chamfer gives you two arrises where a roundover gives you none.</p>
+<p><strong>Inside: 1/4&quot; radius, and it&#x27;s free.</strong> A 1/2&quot; cutter physically cannot leave anything tighter, so a square template hands you rounded inside corners at no cost. Nothing to decide.</p>
+<p>They don&#x27;t match, and they can&#x27;t. Offsetting a rounded square inward *reduces* the corner radius — a 1/2&quot; outer radius with 1/2&quot; walls would want square inner corners, which no router cuts. The mismatch is geometry, not compromise, and it&#x27;s why the wall is thicker at the corners (about 0.6&quot;) than at the faces (1/2&quot;). That extra corner material is what the pivot screw lands in.</p>
+<p><strong>The lid is rounded on every edge</strong>, not just the vertical corners — it&#x27;s what the hand actually picks up.</p>
+<figure><a href="renders/L2_section.png"><img src="renders/L2_section.png" alt="Section" loading="lazy"></a><figcaption>Section</figcaption></figure>
+<h2 id="why-laminated-and-not-hollowed-from-a-blank">Why laminated and not hollowed from a blank</h2>
+<p>A solid block would keep the figure continuous, which matters on a small object. But a blind pocket that deep can&#x27;t be template-routed: the bearing has to sit inside the template, and the deeper you plunge the higher it rides, so past about 1&quot; there&#x27;s nothing guiding the cut. The alternative — a 2-1/4&quot; Forstner in a hand drill — wanders, and a cavity leaning 2° in a 3-1/4&quot; box shows up as visibly uneven walls.</p>
+<p>Cutting the cavity <strong>through</strong> each middle layer sidesteps both. One template pass per layer, dead square, no torque drama.</p>
+<p><strong>Cut the layers in sequence from one board and stack them in the order they came off.</strong> The figure runs on through the glue lines and they nearly vanish — you&#x27;re unrolling the board and putting it back. That gets you most of the way to what a solid blank would have given you.</p>
+<h2 id="making-it">Making it</h2>
+<figure><a href="renders/L2_exploded.png"><img src="renders/L2_exploded.png" alt="Exploded" loading="lazy"></a><figcaption>Exploded</figcaption></figure>
+<p><strong>Ten pieces for the pair, all 3-1/4&quot; square and all 3/4&quot; thick</strong> — 2 bottoms, 2 lids, 5 middles. One thickness throughout means it all comes off the same board and nothing needs planing to size.</p>
+<ol>
+<li><strong>Cut all blanks to 3-1/4&quot; square.</strong></li>
+<li><strong>Rough the opening</strong> in each middle layer — plunge the router in the middle of the waste and work freehand at ~1/4&quot; per pass, staying 1/8&quot; inside the line.</li>
+<li><strong>One template pass at full depth.</strong> The template is a frame: four strips of 1/4&quot; hardboard assembled into a 2-1/4&quot; square window, taped to the blank with double-sided tape. The bearing runs the inside of the window. It happens once, at full depth, because a pattern bit guides nothing at shallower plunges — fine here, since it&#x27;s only removing a sixteenth.</li>
+<li><strong>Glue up</strong> bottom + middles. Lid stays loose.</li>
+<li><strong>Round the corners</strong> — block plane to a chamfer, knock off the two new arrises, then sand. Ten minutes for eight corners, and the slight irregularity looks right on something handmade. A 1/2&quot; roundover bit works too but is fiddly hand-held on a block this size.</li>
+<li><strong>Pivot</strong>: clearance hole through the lid, pilot into the corner post.</li>
+<li><strong>Magnet and steel</strong> at the corner opposite the pivot.</li>
+<li><strong>Oil and wax.</strong></li>
+</ol>
+<h2 id="hardware-and-why-it-matters-here">Hardware, and why it matters here</h2>
+<p><strong>Brass or stainless for the pivot, never plain steel.</strong> Salt rusts a steel screw and bleeds a black stain into the surrounding wood that never comes out.</p>
+<p><strong>Seal the magnet.</strong> Neodymium magnets are nickel-plated and salt eats the plating. Epoxy it into its recess so it&#x27;s capped.</p>
+<p><strong>Magnet to steel, not magnet to magnet</strong> — same holding force, and no way to get the polarity backwards.</p>
+<p><strong>Mineral oil and beeswax, not polyurethane.</strong> Food contact, and renewable when it dulls — which it will, because you&#x27;ll be in it daily.</p>
+<h2 id="wood">Wood</h2>
+<p>A salt box is the one project where good wood is affordable — a pair needs about a foot of 4/4 — one thickness, one board. This is where offcuts of something figured earn their keep. Maple takes a chamfer more crisply than almost anything; cherry darkens with handling, which on a daily object is a feature.</p>
+<h2 id="views">Views</h2>
+<div class="table-wrap"><table><thead><tr><th></th><th></th></tr></thead><tbody>
+<tr><td><code>L2_*.png</code> / <code>L3_*.png</code></td><td>MSG and sugar</td></tr>
+<tr><td><code>*_hero.png</code></td><td>closed</td></tr>
+<tr><td><code>*_open.png</code></td><td>lid swung on the pivot</td></tr>
+<tr><td><code>*_exploded.png</code></td><td>the layers</td></tr>
+<tr><td><code>*_section.png</code></td><td>wall thickness and cavity depth</td></tr>
+</tbody></table></div><footer>Images open at full size when selected. Generated from the editable Markdown guide.</footer></main></body></html>

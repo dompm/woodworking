@@ -10,9 +10,11 @@
 #   S    -- the .scad file to render
 #   OUT  -- directory the .png files go into
 #
-# and may set OPTS (defaults to the Tomorrow colour scheme).
+# and may set OPTS to override publication rendering options.
 
-OPTS="${OPTS:---colorscheme=Tomorrow}"
+DRAWING_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OPTS="${OPTS:-}"
+python3 -c 'import sys; sys.path.insert(0,sys.argv[1]); from render_drawing import install_theme; install_theme()' "$DRAWING_LIB"
 
 # cam <tx,ty,tz,rx,ry,rz,dist>  -- gimbal camera; translations and distance in inches
 cam() {
@@ -34,14 +36,14 @@ ecam() {
 r() {
   local name=$1 size=$2 proj=$3 camera=$4; shift 4
   echo "  $name"
-  openscad -o "$OUT/${name}.png" --imgsize="$size" --projection="$proj" \
-           $OPTS --camera="$(cam "$camera")" "$@" "$S" >/dev/null 2>&1
+  python3 "$DRAWING_LIB/render_drawing.py" --out "$OUT/${name}.png" --size "$size" -- \
+           --projection="$proj" $OPTS --camera="$(cam "$camera")" "$@" "$S"
 }
 
 # re <name> <imgsize> <eye-camera> [extra -D args...]   -- always perspective
 re() {
   local name=$1 size=$2 camera=$3; shift 3
   echo "  $name"
-  openscad -o "$OUT/${name}.png" --imgsize="$size" --projection=p \
-           $OPTS --camera="$(ecam "$camera")" "$@" "$S" >/dev/null 2>&1
+  python3 "$DRAWING_LIB/render_drawing.py" --out "$OUT/${name}.png" --size "$size" -- \
+           --projection=p $OPTS --camera="$(ecam "$camera")" "$@" "$S"
 }

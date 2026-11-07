@@ -33,7 +33,6 @@ ex divider divider 0
 echo "rendering pine"
 "$BLENDER" -b -P lib/scene.py -- \
   --wood pine --parts "$PARTS" --view wide --bottles 0 \
-  --samples "$SAMPLES" --res "$RES" --out "$OUT/beauty_documents.png" \
-  2>&1 | grep -E 'Saved|Error' || true
+  --samples "$SAMPLES" --res "$RES" --out "$OUT/beauty_documents.png"
 
 echo done

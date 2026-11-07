@@ -7,7 +7,7 @@ bit sizes don't have to be re-derived in a store aisle.
 
 | Tool | Model | Notes |
 |---|---|---|
-| **Plunge router** | Mastercraft 11A 2 HP combination plunge / fixed base, with case — [CT 0546821p](https://www.canadiantire.ca/en/pdp/mastercraft-11a-2-hp-corded-combination-plunge-fixed-base-router-with-case-0546821p.html) | **1/2" collet**, variable speed. Combo kit, so both plunge and fixed bases. 4-step turret, ~1" total. |
+| **Plunge router** | Mastercraft **054-6821-2**, 11A combination plunge / fixed base, with case — model confirmed | **1/2" collet and 1/4" adapter sleeve on hand**, confirmed. Both bases. [Manufacturer manual](https://apps.mecanair.net/mecanair/st/gesfic4b.asp?cuser=&id1=&kscannerdoc=554806) specifies **25,000 RPM**. |
 | **Mitre saw** | Genesis sliding compound, 10" — almost certainly **GMSDR1015LC** (confirm on the motor plate) | 15A, 4800 RPM. **10" blade, 5/8" arbor.** Crosscuts **12" at 90°**, so the 9-1/4" boards go through in one pass with room to spare. Ships with a 60T carbide blade. |
 | **Circular saw** | Black & Decker, model unrecorded | Carbide-tipped blade fitted, **visibly rusted** — replace before use. |
 | **Jigsaw** | Skil 4225, 3200 SPM | ⚠️ Older model; likely takes **U-shank** blades, not the modern T-shank. Verify before buying blades. |

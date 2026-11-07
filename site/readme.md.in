@@ -1,0 +1,52 @@
+# Woodworking
+
+Models, drawings and build notes for my woodworking projects.
+
+| Project | Description | Status | Build notes |
+|---|---|---|---|
+{{PROJECTS}}
+
+## Website
+
+The static website is built from `site/projects.json` and the project files.
+The same catalog supplies the project list above. Edit `site/readme.md.in` for
+the rest of this README.
+
+```sh
+python3 site/build.py
+python3 -m http.server 8000 --directory site/dist
+```
+
+Open [localhost:8000](http://localhost:8000) to preview it. Upload the contents
+of `site/dist/` to a static web host to publish it. The intended address is
+[woodworking.dominiquepiche.com](https://woodworking.dominiquepiche.com/).
+
+## Files
+
+- `projects/`: models, renders, build notes and generated guides for each project.
+- `lib/`: shared models, rendering tools and guide styles.
+- [TOOLS.md](TOOLS.md): shop tools and accessories.
+- [JIGS.md](JIGS.md): jig designs and setup notes.
+- [SHOPPING.md](SHOPPING.md): materials and tools still to buy.
+
+The document unit and wine rack use the same casework model with different
+parameters. The other projects have their own models.
+
+## Generating drawings and guides
+
+OpenSCAD generates the working views and meshes. Blender generates the studio
+renders. Python and Pillow are used for publication images, guides and the site.
+
+```sh
+brew install --cask openscad blender
+python3 -m pip install pillow
+
+projects/wine-rack/render.sh
+projects/wine-rack/render_beauty.sh
+lib/render_jigs.sh
+python3 lib/build_guides.py
+```
+
+Each project contains its own generation scripts. Design dimensions are in
+inches unless noted; the OpenSCAD models export millimetres by default.
+Check stock thickness and fit before using a generated cut list.

@@ -1,0 +1,202 @@
+{
+  "title": "Woodworking",
+  "url": "https://woodworking.dominiquepiche.com",
+  "repository": "https://github.com/dompm/woodworking",
+  "projects": [
+    {
+      "slug": "travel-yahtzee",
+      "title": "Travel Yahtzee box",
+      "status": "Design",
+      "description": "A sliding-lid box for five dice, a mini mechanical pencil and a 4 \u00d7 6-inch scorepad.",
+      "material": "Baltic birch plywood",
+      "dimensions": "118 \u00d7 216 \u00d7 35 mm",
+      "hero": "renders/butt_open.png",
+      "guides": [
+        {
+          "file": "guide.html",
+          "title": "Box build guide"
+        },
+        {
+          "file": "router-table-guide.html",
+          "title": "Optional router table and finger joints"
+        }
+      ],
+      "notes": [
+        "The lid runs in grooves in the quarter-inch walls. Butt joints are the simple option; finger joints are an alternative.",
+        "The pencil compartment has a raised floor so the pencil is easier to pick up. Final fitting depends on the actual plywood, dice and pencil. A travel catch is still to be chosen."
+      ],
+      "views": [
+        {
+          "file": "renders/butt_closed.png",
+          "caption": "Closed box"
+        },
+        {
+          "file": "renders/butt_detail.png",
+          "caption": "Butt-joint corner"
+        },
+        {
+          "file": "renders/finger_open.png",
+          "caption": "Finger-joint alternative"
+        },
+        {
+          "file": "renders/guide_groove_section.svg",
+          "caption": "Lid groove section"
+        },
+        {
+          "file": "renders/butt_stage04.png",
+          "caption": "Dividers and pencil compartment"
+        }
+      ]
+    },
+    {
+      "slug": "document-unit",
+      "title": "Document unit",
+      "status": "Built",
+      "description": "A pine unit with ten compartments for letter and A4 folders.",
+      "material": "Pine",
+      "dimensions": "26\u00bc \u00d7 11 \u00d7 22 in",
+      "hero": "renders/beauty_documents.png",
+      "guides": [
+        {
+          "file": "guide.html",
+          "title": "Build guide"
+        }
+      ],
+      "notes": [
+        "The shelves sit in housings in the sides and cross a central divider with half-lap joints. The back is open.",
+        "This unit is built. It uses the same casework model as the wine rack, with different compartment dimensions and no legs."
+      ],
+      "views": [
+        {
+          "file": "photos/built-closet.jpg",
+          "caption": "The finished unit in place",
+          "kind": "Photo"
+        },
+        {
+          "file": "photos/built-kitchen.jpg",
+          "caption": "The finished unit before installation",
+          "kind": "Photo"
+        },
+        {
+          "file": "renders/exploded.png",
+          "caption": "Parts and assembly"
+        },
+        {
+          "file": "renders/front.png",
+          "caption": "Front elevation"
+        }
+      ]
+    },
+    {
+      "slug": "wine-rack",
+      "title": "Wine rack",
+      "status": "Design",
+      "description": "A twelve-bottle rack with housed shelves and splayed legs.",
+      "material": "Walnut; other material options modeled",
+      "dimensions": "10\u00bc \u00d7 9 \u00d7 39\u00bd in",
+      "hero": "renders/beauty_walnut.png",
+      "guides": [
+        {
+          "file": "guide.html",
+          "title": "Build guide"
+        }
+      ],
+      "notes": [
+        "Two columns of compartments hold twelve bottles. The shelves and divider use the same housed and half-lapped joints as the document unit.",
+        "The modeled options include walnut or cherry with tapered legs, a pine version with square legs, and an ash version with metal legs."
+      ],
+      "views": [
+        {
+          "file": "renders/beauty_cherry.png",
+          "caption": "Cherry option"
+        },
+        {
+          "file": "renders/beauty_pine.png",
+          "caption": "Pine with square legs"
+        },
+        {
+          "file": "renders/beauty_ash_metal.png",
+          "caption": "Ash with metal legs"
+        },
+        {
+          "file": "renders/beauty_detail.png",
+          "caption": "Leg detail"
+        },
+        {
+          "file": "renders/exploded.png",
+          "caption": "Assembly view"
+        }
+      ]
+    },
+    {
+      "slug": "salt-boxes",
+      "title": "Salt boxes",
+      "status": "Design",
+      "description": "Two small hardwood boxes with pivoting lids, sized for MSG and sugar.",
+      "material": "Laminated hardwood",
+      "dimensions": "3\u00bc in square; two heights",
+      "hero": "renders/L2_open.png",
+      "guides": [
+        {
+          "file": "guide.html",
+          "title": "Build notes"
+        }
+      ],
+      "notes": [
+        "The bodies are built from stacked layers with openings cut through them. The two boxes share a footprint and differ in height.",
+        "Each lid pivots on a screw. The design includes a magnet and steel closure at the opposite corner."
+      ],
+      "views": [
+        {
+          "file": "renders/L2_hero.png",
+          "caption": "Short box, closed"
+        },
+        {
+          "file": "renders/L3_open.png",
+          "caption": "Taller box"
+        },
+        {
+          "file": "renders/L2_exploded.png",
+          "caption": "Laminated parts"
+        },
+        {
+          "file": "renders/L2_section.png",
+          "caption": "Wall and cavity section"
+        }
+      ]
+    },
+    {
+      "slug": "bedside-table",
+      "title": "Bedside table",
+      "status": "Design",
+      "description": "An open birch cubby on tapered steel legs.",
+      "material": "Yellow birch and steel",
+      "dimensions": "16 \u00d7 12 \u00d7 21 in",
+      "hero": "renders/beauty_yellow_birch.png",
+      "guides": [
+        {
+          "file": "guide.html",
+          "title": "Build guide"
+        }
+      ],
+      "notes": [
+        "Four solid-wood panels form the cubby. The top and bottom have rabbets that locate the sides during assembly.",
+        "The design uses 14-inch tapered steel legs with adjustable feet. The cubby is open at the front and back."
+      ],
+      "views": [
+        {
+          "file": "renders/beauty_front.png",
+          "caption": "Front view"
+        },
+        {
+          "file": "renders/exploded.png",
+          "caption": "Parts and assembly"
+        },
+        {
+          "file": "renders/joint.png",
+          "caption": "Corner joint"
+        }
+      ]
+    }
+  ]
+}

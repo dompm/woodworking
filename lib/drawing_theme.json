@@ -1,0 +1,18 @@
+{
+  "name": "Woodworking",
+  "index": 1900,
+  "show-in-gui": true,
+  "colors": {
+    "background": "#faf8f3",
+    "axes-color": "#263a3b",
+    "opencsg-face-front": "#dfc7a1",
+    "opencsg-face-back": "#bfd7dc",
+    "cgal-face-front": "#dfc7a1",
+    "cgal-face-back": "#bfd7dc",
+    "cgal-face-2d": "#dfc7a1",
+    "cgal-edge-front": "#476368",
+    "cgal-edge-back": "#476368",
+    "cgal-edge-2d": "#476368",
+    "crosshair": "#315d6a"
+  }
+}

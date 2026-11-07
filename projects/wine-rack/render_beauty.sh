@@ -53,19 +53,25 @@ for wood in walnut cherry; do
   "$BLENDER" -b -P lib/scene.py -- \
     --wood "$wood" --parts "$EXP/parts" --view hero \
     --samples "$SAMPLES" --res "$RES" \
-    --out "$OUT/beauty_${wood}.png" 2>&1 | grep -E 'Saved|Error' || true
+    --out "$OUT/beauty_${wood}.png"
 done
 
 echo "rendering pine (scandinavian)"
 "$BLENDER" -b -P lib/scene.py -- \
   --wood pine --parts "$EXP/parts_scandi" --view hero \
-  --samples 300 --res 1200x1650 \
-  --out "$OUT/beauty_pine.png" 2>&1 | grep -E 'Saved|Error' || true
+  --samples 300 --res 1400x1900 \
+  --out "$OUT/beauty_pine.png"
+
+echo "rendering ash with metal legs"
+"$BLENDER" -b -P lib/scene.py -- \
+  --wood ash --legs metal --parts "$EXP/parts_scandi" --view hero \
+  --samples "$SAMPLES" --res "$RES" \
+  --out "$OUT/beauty_ash_metal.png"
 
 echo "rendering detail"
 "$BLENDER" -b -P lib/scene.py -- \
   --wood walnut --parts "$EXP/parts" --view detail \
   --samples "$SAMPLES" --res 1600x1200 \
-  --out "$OUT/beauty_detail.png" 2>&1 | grep -E 'Saved|Error' || true
+  --out "$OUT/beauty_detail.png"
 
 echo done
