@@ -138,11 +138,12 @@ def guide_index():
 
 def readme():
     rows=[]
+    site_url=DATA['url'].rstrip('/')
     for p in PROJECTS:
-        guide=f'[Guide](projects/{p["slug"]}/guide.html)' if p['guides'] else '—'
-        rows.append(f'| [{p["title"]}](projects/{p["slug"]}/) | {p["description"]} | {p["status"]} | {guide} |')
+        guides=' · '.join(f'[{g["title"]}]({site_url}/guides/{p["slug"]}/{g["file"]})' for g in p['guides']) or '—'
+        rows.append(f'| [{p["title"]}]({site_url}/projects/{p["slug"]}/) | {p["description"]} | {p["status"]} | {guides} |')
     template=(HERE/'readme.md.in').read_text()
-    (ROOT/'README.md').write_text(template.replace('{{PROJECTS}}','\n'.join(rows)))
+    (ROOT/'README.md').write_text(template.replace('{{PROJECTS}}','\n'.join(rows)).replace('{{SITE_URL}}',site_url))
 
 def main():
     subprocess.run([sys.executable,str(ROOT/'lib/build_guides.py')],check=True)

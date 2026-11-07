@@ -2,13 +2,15 @@
 
 Models, drawings and build notes for my woodworking projects.
 
+Browse the [projects and build guides](https://woodworking.dominiquepiche.com/).
+
 | Project | Description | Status | Build notes |
 |---|---|---|---|
-| [Travel Yahtzee box](projects/travel-yahtzee/) | A sliding-lid box for five dice, a mini mechanical pencil and a 4 × 6-inch scorepad. | Design | [Guide](projects/travel-yahtzee/guide.html) |
-| [Document unit](projects/document-unit/) | A pine unit with ten compartments for letter and A4 folders. | Built | [Guide](projects/document-unit/guide.html) |
-| [Wine rack](projects/wine-rack/) | A twelve-bottle rack with housed shelves and splayed legs. | Design | [Guide](projects/wine-rack/guide.html) |
-| [Salt boxes](projects/salt-boxes/) | Two small hardwood boxes with pivoting lids, sized for MSG and sugar. | Design | [Guide](projects/salt-boxes/guide.html) |
-| [Bedside table](projects/bedside-table/) | An open birch cubby on tapered steel legs. | Design | [Guide](projects/bedside-table/guide.html) |
+| [Travel Yahtzee box](https://woodworking.dominiquepiche.com/projects/travel-yahtzee/) | A sliding-lid box for five dice, a mini mechanical pencil and a 4 × 6-inch scorepad. | Design | [Box build guide](https://woodworking.dominiquepiche.com/guides/travel-yahtzee/guide.html) · [Optional router table and finger joints](https://woodworking.dominiquepiche.com/guides/travel-yahtzee/router-table-guide.html) |
+| [Document unit](https://woodworking.dominiquepiche.com/projects/document-unit/) | A pine unit with ten compartments for letter and A4 folders. | Built | [Build guide](https://woodworking.dominiquepiche.com/guides/document-unit/guide.html) |
+| [Wine rack](https://woodworking.dominiquepiche.com/projects/wine-rack/) | A twelve-bottle rack with housed shelves and splayed legs. | Design | [Build guide](https://woodworking.dominiquepiche.com/guides/wine-rack/guide.html) |
+| [Salt boxes](https://woodworking.dominiquepiche.com/projects/salt-boxes/) | Two small hardwood boxes with pivoting lids, sized for MSG and sugar. | Design | [Build notes](https://woodworking.dominiquepiche.com/guides/salt-boxes/guide.html) |
+| [Bedside table](https://woodworking.dominiquepiche.com/projects/bedside-table/) | An open birch cubby on tapered steel legs. | Design | [Build guide](https://woodworking.dominiquepiche.com/guides/bedside-table/guide.html) |
 
 ## Website
 
@@ -22,8 +24,7 @@ python3 -m http.server 8000 --directory site/dist
 ```
 
 Open [localhost:8000](http://localhost:8000) to preview it. Upload the contents
-of `site/dist/` to a static web host to publish it. The intended address is
-[woodworking.dominiquepiche.com](https://woodworking.dominiquepiche.com/).
+of `site/dist/` to a static web host to publish it.
 
 ## Files
 
