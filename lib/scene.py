@@ -42,8 +42,9 @@ ap.add_argument("--res", default="1400x1900")
 ap.add_argument("--parts", default="projects/wine-rack/exports/parts")
 ap.add_argument("--view", default="hero",
                 choices=["hero", "front", "detail", "wide",
-                         "bedside_hero", "bedside_front", "bedside_detail"])
-ap.add_argument("--model", default="winerack", choices=["winerack", "bedside"])
+                         "bedside_hero", "bedside_front", "bedside_detail",
+                         "saltbox_hero", "saltbox_detail", "saltbox_front"])
+ap.add_argument("--model", default="winerack", choices=["winerack", "bedside", "saltbox"])
 ap.add_argument("--bottles", default="1")
 ap.add_argument("--legs", default="wood", choices=["wood", "metal"])
 args = ap.parse_args(argv)
@@ -157,6 +158,21 @@ MODELS = {
             "brass": ["glides"],
         },
         smooth={"legs", "glides"},
+    ),
+    "saltbox": dict(
+        groups={
+            "wood_x": [
+                "short_bottom", "short_mid0", "short_mid1", "short_lid",
+                "tall_bottom", "tall_mid0", "tall_mid1", "tall_mid2", "tall_lid",
+            ],
+            "brass": ["short_brass", "tall_brass"],
+            "steel": ["short_steel", "tall_steel"],
+        },
+        smooth={
+            "short_bottom", "short_mid0", "short_mid1", "short_lid",
+            "tall_bottom", "tall_mid0", "tall_mid1", "tall_mid2", "tall_lid",
+            "short_brass", "tall_brass", "short_steel", "tall_steel",
+        },
     ),
 }
 GROUPS = MODELS[args.model]["groups"]
@@ -546,6 +562,10 @@ VIEWS = {
     "bedside_hero":   (32, 14, 1.95, 75, 0.52),
     "bedside_front":  (0, 8, 1.95, 80, 0.52),
     "bedside_detail": (36, 12, 1.05, 85, 0.80),
+    # Salt boxes: 0.10 m tall, 0.24 m wide pair
+    "saltbox_hero":   (34, 25, 0.76, 85, 0.46, -0.12, 0.0),
+    "saltbox_detail": (34, 26, 0.58, 85, 0.45, -0.45, -0.10),
+    "saltbox_front":  (0, 16, 0.76, 85, 0.45),
 }
 _v = VIEWS[args.view]
 az, el, dist, focal, aim = _v[:5]
