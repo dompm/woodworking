@@ -88,9 +88,9 @@
       "title": "Salt boxes",
       "status": "Design",
       "description": "Two small hardwood boxes with pivoting lids, sized for MSG and sugar.",
-      "material": "Laminated hardwood",
+      "material": "Laminated walnut and brass",
       "dimensions": "3\u00bc in square; two heights",
-      "hero": "renders/L2_open.png",
+      "hero": "renders/beauty_walnut.png",
       "guides": [
         {
           "file": "guide.html",
@@ -102,6 +102,10 @@
         "Each lid pivots on a screw. The design includes a magnet and steel closure at the opposite corner."
       ],
       "views": [
+        {
+          "file": "renders/beauty_detail.png",
+          "caption": "Pivoting lid and cavity detail"
+        },
         {
           "file": "renders/L2_hero.png",
           "caption": "Short box, closed"
