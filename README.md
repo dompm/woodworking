@@ -31,7 +31,6 @@ of `site/dist/` to a static web host to publish it.
 - `lib/`: shared models, rendering tools and guide styles.
 - [TOOLS.md](TOOLS.md): shop tools and accessories.
 - [JIGS.md](JIGS.md): jig designs and setup notes.
-- [SHOPPING.md](SHOPPING.md): materials and tools still to buy.
 
 The document unit and wine rack use the same casework model with different
 parameters. The other projects have their own models.
