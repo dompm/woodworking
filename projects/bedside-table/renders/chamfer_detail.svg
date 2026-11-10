@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 450" role="img" aria-labelledby="title desc">
+<title id="title">Mitred cubby and chamfer locations</title>
+<desc id="desc">Front opening, four mitre seams, and an enlarged top-left corner section. Chamfers are 1.59 mm along each adjacent face.</desc>
+<style>
+text {font-family:system-ui,sans-serif;fill:#263a3b;font-size:17px}
+.label {font-size:14px;fill:#53696a} .line {fill:none;stroke:#476368;stroke-width:1.5}
+.accent {fill:none;stroke:#315d6a;stroke-width:3} .dim {fill:none;stroke:#53696a;stroke-width:1}
+</style>
+<rect width="1100" height="450" fill="#faf8f3"/>
+<text x="40" y="42">Chamfer locations</text><text x="700" y="42">Top-left corner section</text>
+<polygon points="41.812,100.000 502.188,100.000 504.000,101.812 504.000,301.188 502.188,303.000 41.812,303.000 40.000,301.188 40.000,101.812" fill="#dfc7a1" stroke="#476368" stroke-width="1.5"/>
+<polygon points="61.750,121.750 482.250,121.750 482.250,281.250 61.750,281.250" fill="#faf8f3" stroke="#315d6a" stroke-width="3"/>
+<polygon points="41.812,100.000 502.188,100.000 504.000,101.812 504.000,301.188 502.188,303.000 41.812,303.000 40.000,301.188 40.000,101.812" class="accent"/>
+<path d="M40,100 L61.75,121.75" class="line"/>
+<path d="M504.0,100 L482.25,121.75" class="line"/>
+<path d="M40,303.0 L61.75,281.25" class="line"/>
+<path d="M504.0,303.0 L482.25,281.25" class="line"/>
+
+<path d="M40,84 H504.0" class="dim"/><text x="272.0" y="75" text-anchor="middle">16 in</text>
+<text x="520.0" y="201.5">7 in</text>
+<text x="40" y="350" class="label">Chamfer both front and back opening rims.</text>
+<text x="40" y="377" class="label">Also chamfer the four outside corners along the 12-inch depth.</text>
+<polygon points="709.167,105.000 1008.000,105.000 1008.000,215.000 810.000,215.000 704.583,109.583" fill="#dfc7a1" stroke="#476368" stroke-width="1.5"/>
+<polygon points="700.000,114.167 704.583,109.583 810.000,215.000 810.000,336.000 700.000,336.000" fill="#bfd7dc" stroke="#476368" stroke-width="1.5"/>
+<path d="M709.1666666666666,105 L700,114.16666666666667" class="accent"/>
+<path d="M704.5833333333334,109.58333333333333 L672,85 H635" class="dim"/>
+<text x="630" y="78" text-anchor="end" class="label">1/16 in on each face</text>
+<text x="854.0" y="165.5" text-anchor="middle">Top</text>
+<text x="749.5" y="286.5" text-anchor="middle">Side</text>
+<path d="M777.0,182.0 L843.0,259.0 H997.0" class="dim"/>
+<text x="848.5" y="286.5" class="label">45° mitre face</text>
+<text x="700" y="390" class="label">Route after the joint is glued and flushed.</text>
+</svg>

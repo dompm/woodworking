@@ -1,15 +1,9 @@
 // =============================================================
 //  Bedside table -- cubby box in solid yellow birch
 //
-//  Parametric CAD model for a mid-century cubby bedside table:
-//  - 18" W x 13" D x 7" H carcass in 3/4" yellow birch
-//  - Joinery options: "rabbet" (default, self-squaring 3/8" rebate),
-//    "miter" (45-degree through miter), or "butt" (simple butt joint)
-//  - Refined 1/8" chamfer easing all outer and inner rim arrises
-//    and the 4 long front-to-back horizontal corners
-//  - Completely open pass-through for cables and clean minimalist look
-//  - 14" mid-century splayed tapered conical metal legs (21" overall height,
-//    perfect match for IKEA MALM bed / 55 cm nightstand standard)
+//  16" W x 12" D x 7" H carcass in 3/4" yellow birch on 14" metal legs.
+//  Default: four 45-degree mitres, with 1/16" finishing chamfers on both
+//  opening rims and the four outside front-to-back corners.
 //
 //  ALL DESIGN MATH IS IN INCHES. Emits millimetres (UNIT = 25.4) on output.
 // =============================================================
@@ -21,25 +15,25 @@ UNIT = 25.4;
 mode = "assembled";
 
 // ---------------- joinery style ----------------
-// "rabbet" (recommended DIY) | "miter" | "butt"
-joint_type = "rabbet";
+// "miter" | "rabbet" | "butt"
+joint_type = "miter";
 
 show_legs   = true;
 show_screws = false;
-chamfer_on  = false; // Set false for clean, honest rabbet casework; true for miter
+chamfer_on  = true;
 
 
 // ---------------- carcass dimensions ----------------
-W = 16.00;   // outside width (scaled down from 18" to 16" for compact nightstand)
-D = 12.00;   // outside depth (scaled from 13" to 12" for perfect 4:3 proportion)
-H =  7.00;   // outside height of wooden box (matches IKEA MALM height with 14" legs)
+W = 16.00;   // outside width before edge treatment
+D = 12.00;   // front-to-back depth
+H =  7.00;   // outside height of wooden box
 T =  0.75;   // stock thickness (4/4 yellow birch planed to 3/4")
 
 // Rabbet dimensions (for joint_type == "rabbet")
 R_DEPTH = 0.375; // 3/8" deep rabbet (half of stock thickness T)
 R_WIDTH = T;     // 3/4" wide rabbet to receive side panel
 
-CHAMFER = 0.125; // 1/8" chamfer (used if chamfer_on = true)
+CHAMFER = 0.0625; // 1/16" leg on each adjacent face; route after glue-up
 
 // Internal clear opening (derived)
 CLEAR_W = W - 2*T;  // 14.50"
@@ -83,6 +77,9 @@ EPS = 0.01;
 $fn = 48;
 
 c = chamfer_on ? CHAMFER : 0;
+assert(joint_type == "miter" || joint_type == "rabbet" || joint_type == "butt");
+assert(T > 0 && W > 2*T && H > 2*T && D > 2*c);
+assert(c >= 0 && 2*c < T, "Chamfers must leave material between the opening rims");
 
 // =============================================================
 //  2D board cross-sections (in X-Z plane, extruded along Y)
@@ -206,14 +203,15 @@ poly_right  = (joint_type == "rabbet") ? poly_right_rabbet :
 // =============================================================
 
 // Right-triangle prism cutter along X: cross section in Y-Z
+// The Y rotation maps local X to world -Z, hence the negated Z coordinates.
 module chamfer_wedge_x(x0, x1, y0, z0, dy, dz) {
     translate([x0 - EPS, 0, 0])
         rotate([0, 90, 0])
             linear_extrude(height = (x1 - x0) + 2*EPS)
                 polygon([
-                    [z0 - dz*EPS, y0 - dy*EPS],
-                    [z0 + dz*(c + EPS), y0 - dy*EPS],
-                    [z0 - dz*EPS, y0 + dy*(c + EPS)]
+                    [-(z0 - dz*EPS), y0 - dy*EPS],
+                    [-(z0 + dz*(c + EPS)), y0 - dy*EPS],
+                    [-(z0 - dz*EPS), y0 + dy*(c + EPS)]
                 ]);
 }
 
@@ -429,7 +427,8 @@ module exploded() {
 }
 
 // Cutting layout of continuous board blank:
-// Rabbet: Left (6.25") + Top (18") + Right (6.25") + Bottom (18") = 48.5" total
+// Finished long-point lengths only. Allow extra stock for opposing bevel
+// cutoffs, kerfs and squaring; this view is not a shared-cut cutting pattern.
 module waterfall() {
     kerf = 0.125;
     side_len = (joint_type == "rabbet") ? (H - 2*(T - R_DEPTH)) :
@@ -452,6 +451,9 @@ module joint_detail() {
 // =============================================================
 //  Root selection & scaling
 // =============================================================
+
+if (mode == "manifest")
+    echo(str("CUBBY|", W, "|", D, "|", H, "|", T, "|", c));
 
 scale(UNIT) {
     if (mode == "assembled")                                    assembled();

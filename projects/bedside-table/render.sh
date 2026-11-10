@@ -38,12 +38,13 @@ re exploded       1600,1300   54,-50,26,8,6,-5.5      -D 'mode="exploded"'
 # Close-up corner joint
 re joint          1300,950    12,-16,12,0.5,2.5,6.8   -D 'mode="joint"'
 
-# Board cutting layout (45" total length)
-r waterfall       1600,600  o 22.5,6,0.375,0,0,0,52   -D 'mode="waterfall"'
+# Finished long-point layout (46" plus display gaps; bevel waste is additional)
+r waterfall       1600,600  o 23.1875,6,0.375,0,0,0,52   -D 'mode="waterfall"'
 
 # Mesh exports
 echo "  meshes"
 openscad -o "$EXP/bedside_table.stl" "$S" >/dev/null 2>&1
 openscad -o "$EXP/bedside_table.3mf" "$S" >/dev/null 2>&1 || true
+python3 projects/bedside-table/illustrate.py
 
 echo done
