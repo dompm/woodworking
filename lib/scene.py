@@ -38,7 +38,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--wood", default="walnut")
 ap.add_argument("--out", default="projects/wine-rack/renders/beauty.png")
 ap.add_argument("--samples", type=int, default=256)
-ap.add_argument("--res", default="1400x1900")
+ap.add_argument("--res", default="1800x1350")
 ap.add_argument("--parts", default="projects/wine-rack/exports/parts")
 ap.add_argument("--view", default="hero",
                 choices=["hero", "front", "detail", "wide",
@@ -138,12 +138,40 @@ def shade_smooth(obj, angle_deg=32):
                 pass
 
 
+def align_axis_to_z(obj):
+    """Rotate a tilted leg mesh back to vertical in object-local space and move
+    the tilt onto the object transform so Object-space grain runs along the
+    leg's own axis instead of slicing diagonally across horizontal rings."""
+    verts = [v.co for v in obj.data.vertices]
+    if len(verts) < 4:
+        return
+    zs = [v.z for v in verts]
+    zmin, zmax = min(zs), max(zs)
+    span = zmax - zmin
+    if span <= 1e-6:
+        return
+    band = span * 0.15
+    top = [v for v in verts if v.z >= zmax - band]
+    bot = [v for v in verts if v.z <= zmin + band]
+    if not top or not bot:
+        return
+    c_top = sum(top, Vector()) / len(top)
+    c_bot = sum(bot, Vector()) / len(bot)
+    axis = (c_top - c_bot).normalized()
+    q = Vector((0.0, 0.0, 1.0)).rotation_difference(axis)
+    inv = q.inverted().to_matrix().to_4x4()
+    obj.data.transform(inv)
+    obj.data.update()
+    obj.rotation_euler = q.to_euler()
+
+
 MODELS = {
     "winerack": dict(
         groups={
             "wood_z": ["stile0", "stile1", "divider",
                        "leg0", "leg1", "leg2", "leg3", "blocks"],
-            "wood_x": ["horiz%d" % i for i in range(7)] + ["frame"],
+            "wood_x": ["horiz%d" % i for i in range(7)] + ["frame", "frame_x"],
+            "wood_y": ["frame_y"],
             "brass": ["brass"],
             "steel": ["steel"],
             "glass": ["bottles"],
@@ -176,7 +204,7 @@ MODELS = {
     ),
 }
 GROUPS = MODELS[args.model]["groups"]
-if args.wood == "walnut" and args.legs == "wood" and args.model == "winerack":
+if args.legs == "wood" and args.model == "winerack":
     GROUPS = {group: list(names) for group, names in GROUPS.items()}
     GROUPS["wood_zq"] = [name for name in GROUPS["wood_z"] if name.startswith("leg")]
     GROUPS["wood_z"] = [name for name in GROUPS["wood_z"] if not name.startswith("leg")]
@@ -209,6 +237,8 @@ for group, names in GROUPS.items():
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         # per-object origin so each board gets its own texture space
         bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="BOUNDS")
+        if args.model == "winerack" and name.startswith("leg"):
+            align_axis_to_z(obj)
         if name in SMOOTH:
             shade_smooth(obj)
         imported.setdefault(group, []).append(obj)
@@ -217,9 +247,12 @@ all_objs = [o for objs in imported.values() for o in objs]
 if not all_objs:
     raise SystemExit("nothing imported from %s" % PARTS)
 
-# drop the whole assembly so the feet sit on z = 0
+# drop the whole assembly so the feet sit flush on z = 0.
+# Refresh matrix_world first (legs may carry an object rotation) and sample
+# actual vertices rather than bound_box corners, which overhang on rotated legs.
+bpy.context.view_layer.update()
 min_z = min(
-    (o.matrix_world @ Vector(c)).z for o in all_objs for c in o.bound_box
+    (o.matrix_world @ v.co).z for o in all_objs for v in o.data.vertices
 )
 for o in all_objs:
     o.location.z -= min_z
@@ -251,7 +284,7 @@ def new_mat(name):
     return mat, nt, bsdf
 
 
-def wood_material(name, length_axis, pith_d=0.110, warp=1.0, quarter=False):
+def wood_material(name, length_axis, pith_d=0.110, warp=1.0, quarter=False, rift=False):
     """Growth rings as concentric cylinders around a pith axis, which is what
     they physically are.  A board is then an off-centre slice through those
     cylinders, and the cathedral figure falls out of the geometry instead of
@@ -300,7 +333,14 @@ def wood_material(name, length_axis, pith_d=0.110, warp=1.0, quarter=False):
     # what the top of this table is specified as, and it is also the only way a
     # 21"-wide panel stops reading as corduroy: the lines are meant to be
     # straight, they just have to be at a believable pitch and not aliasing.
-    pith = ({"X": (0.0, pith_d, 0.008),
+    # Riftsawn: pith sits on the 45-degree diagonal, so all four faces of a
+    # square tapered leg cross the rings cleanly lengthwise instead of one pair
+    # of faces sitting tangent to the rings and showing horizontal chevrons.
+    r45 = pith_d * 0.7071
+    pith = ({"X": (0.0, r45, r45),
+             "Y": (r45, 0.0, r45),
+             "Z": (r45, r45, 0.0)}[axis] if rift else
+            {"X": (0.0, pith_d, 0.008),
              "Y": (pith_d, 0.0, 0.008),
              "Z": (pith_d, 0.008, 0.0)}[axis] if quarter else
             {"X": (0.0, 0.010, pith_d),
@@ -527,7 +567,7 @@ MATS = {
     # and there is no ring gradient for the warp to perturb -- the warp becomes
     # the whole pattern, and 10 mm of it on a 1-3/4" face renders as a violent
     # chevron on one face while the face beside it stays perfectly straight.
-    "wood_zq": wood_material("wood_zq", "Z", pith_d=0.90, warp=0.22),
+    "wood_zq": wood_material("wood_zq", "Z", pith_d=0.90, warp=0.22, rift=True),
     "wood_xq": wood_material("wood_xq", "X", pith_d=0.42),
     "brass": brass_material(),
     "steel": steel_material(),
@@ -553,8 +593,8 @@ render_style.studio(scene, (CX, CY, TOP * 0.5), scale=FULL_SCALE,
 # --------------------------------------------------------------------------
 VIEWS = {
     # (azimuth deg from -Y, elevation deg, distance m, focal mm, aim height frac)
-    "hero":   (34, 6, 3.2, 85, 0.46),
-    "front":  (4, 6, 3.2, 105, 0.50),
+    "hero":   (34, 6, 4.10, 85, 0.49),
+    "front":  (4, 6, 4.10, 105, 0.50),
     "detail": (40, -4, 1.3, 85, 0.13),
     # for a wide, low case rather than a tall narrow one
     "wide":   (32, 12, 2.15, 70, 0.50),

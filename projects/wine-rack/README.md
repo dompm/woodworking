@@ -33,32 +33,28 @@ openscad -D 'mode="joint"'     lib/casework.scad   # corner detail
 openscad -D show_bottles=false lib/casework.scad
 ```
 
-## Two builds from one model
+## Base options from one model
 
-| | Mid-century (walnut) | Scandinavian (pine) |
-|---|---|---|
-| `LEG_STYLE` | `round` | `square` |
-| `DEPTH` | 9 | **9.25** — a 1x10 S4S is actually 9-1/4 |
-| Legs | bought, splayed 8&deg;, brass ferrules, angled steel plates | **made**: 1-1/2 sq tapering to 7/8, plumb, tapered on the two inner faces only |
-| Leg fixing | steel plate + hangar bolt | two glue blocks per leg, no hardware at all |
-| Overall height | 39-1/2 | 39-1/4 |
-| Lap slot depth | 4-1/2 | 4-5/8 |
-| Everything else | | *identical* |
+| | Turned wood (walnut / cherry) | Recessed wood frame (pine) | Bought steel (ash) |
+|---|---|---|---|
+| `LEG_STYLE` | `round` | `square` | `metal` |
+| `DEPTH` | 9 | **9.25** — 1×10 S4S actual width | 9 |
+| Legs | bought, splayed 8&deg;, brass ferrules, angled steel plates | **made**: 1-1/4 sq tapering to 3/4 on all four faces, splayed 8&deg; | bought black steel, 1-1/16 to 9/16 taper, splayed 8&deg;, rubber caps |
+| Leg fixing | angled steel plate + hangar bolt | slim 3/4 × 1-1/4 recessed apron frame inset 3/4" | flat 4-hole welded mounting plate |
+| Overall height | 39-1/2 | 39-1/8 | 39-1/4 |
+| Lap slot depth | 4-1/2 | 4-5/8 | 4-1/2 |
+| Everything else | *identical* | *identical* | *identical* |
 
 ```sh
 openscad -D 'LEG_STYLE="square"' -D DEPTH=9.25 lib/casework.scad
+openscad -D 'LEG_STYLE="metal"' lib/casework.scad
 ```
 
-Part lengths and all seven housing positions are the same in both, because every
-part is cut along the board and uses its full width — only the width and the lap
-depth follow `DEPTH`. So the pine build is a true rehearsal for the walnut one,
-not an approximation of it.
-
-The square leg is tapered on its **two inner faces only**, so the outer faces
-stay plumb and carry the line of the case sides down to the floor. That
-asymmetry is the whole character of the leg, and it is why the splayed
-mid-century version and this one read as different pieces of furniture rather
-than the same piece in two woods.
+Part lengths and all seven housing positions stay the same across all three
+options, because every carcass part uses the full board width and only the lap
+depth follows `DEPTH`. The pine variant replaces corner glue blocks with a slim
+recessed apron frame and slender splayed tapered legs so the shop-made wood base
+holds the same visual weight as the turned and steel versions.
 
 ## Views
 
@@ -76,7 +72,7 @@ than the same piece in two woods.
 | `motion.png` | top rail dropping onto the two stile ledges |
 | `stile.png` | one stile alone, five dadoes and two end rabbets |
 | `base.png` | leg plates and ferrules |
-| `scandi_base.png` | the pine variant's glue blocks |
+| `scandi_base.png` | the pine variant's recessed base frame and splayed legs |
 
 ## Parameters worth changing
 

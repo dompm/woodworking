@@ -31,9 +31,8 @@ re eggcrate     1150,1250   52,-50,44,5.1,7,14.6       -D 'mode="eggcrate"'
 re motion       1200,1000   30,-34,44,5.125,4.5,28.6   -D 'mode="motion"'
 re stile         800,1350   66,-40,34,0.375,4.5,14.6   -D 'mode="stile"'
 
-# The scandinavian practice variant: square made legs glued into the corners,
-# no hardware, and 1x pine at its actual 9-1/4 width rather than hardwood
-# planed to 9.  Low camera, because the whole point of the view is the blocks.
+# The pine variant: splayed tapered square legs on a slim recessed base frame,
+# cut from 1x pine at its actual 9-1/4 width.  Low camera to show the frame.
 re scandi_base  1100,850    20,-17,8,5.125,4.6,-3.4 \
     -D show_bottles=false -D 'LEG_STYLE="square"' -D DEPTH=9.25
 

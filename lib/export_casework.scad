@@ -18,12 +18,14 @@ PART_I = 0;
 LEG_CORNER = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
 
 module leg_plate(sx, sy) {
-    px = (sx < 0) ? MOUNT_INSET : W - MOUNT_INSET - MOUNT_XY;
-    py = (sy < 0) ? MOUNT_INSET : DEPTH - MOUNT_INSET - MOUNT_XY;
-    if (PLATED) {
+    px = (sx < 0) ? MOUNT_IN : W - MOUNT_IN - MOUNT_XY;
+    py = (sy < 0) ? MOUNT_IN : DEPTH - MOUNT_IN - MOUNT_XY;
+    if (METAL) {
+        metal_plate(sx, sy);
+    } else if (PLATED) {
         translate([px, py, -PLATE_T]) cube([MOUNT_XY, MOUNT_XY, PLATE_T]);
         intersection() {
-            at_leg(sx, sy) cylinder(h = 3, d = LEG_TOP_D);
+            at_leg(sx, sy) cylinder(h = 3, d = LEG_TOP_D_EFF);
             translate([-60, -60, -60 - PLATE_T]) cube([120, 120, 60]);
         }
     } else {
@@ -45,6 +47,8 @@ scale(UNIT) {
     else if (PART == "blocks")
         for (k = [0 : 3]) leg_blocks_fitted(LEG_CORNER[k][0], LEG_CORNER[k][1]);
     else if (PART == "frame")   base_frame();
+    else if (PART == "frame_x") base_frame_x();
+    else if (PART == "frame_y") base_frame_y();
     else if (PART == "brass")
         for (k = [0 : 3]) leg_ferrule(LEG_CORNER[k][0], LEG_CORNER[k][1]);
     else if (PART == "steel")
