@@ -58,7 +58,7 @@
       ],
       "notes": [
         "Two columns of compartments hold twelve bottles. The shelves and divider use the same housed and half-lapped joints as the document unit.",
-        "The modeled options include walnut or cherry with turned tapered legs, a pine version on a recessed base frame with splayed square legs, and an ash version on bought steel legs."
+        "The modeled options include walnut or cherry with turned tapered legs, a pine version with splayed tapered square legs on angled steel plates, and an ash version on bought steel legs."
       ],
       "views": [
         {
@@ -67,7 +67,7 @@
         },
         {
           "file": "renders/beauty_pine.png",
-          "caption": "Pine on recessed base frame"
+          "caption": "Pine with splayed square legs"
         },
         {
           "file": "renders/beauty_ash_metal.png",

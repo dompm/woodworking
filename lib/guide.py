@@ -72,11 +72,9 @@ DADO_DIV   = 0.1875
 LAP_DEPTH  = DEPTH / 2
 LEG_LENGTH = 10.0
 LEG_TILT   = 8.0
-# wood base frame + splayed square legs
-SQ_TOP   = 1.25
+# shop-made tapered square legs (mounted on 8-deg angled steel plates)
+SQ_TOP   = 1.375
 SQ_BOT   = 0.75
-FRAME_H  = 1.25
-FRAME_IN = 0.75
 SQ_SPLAY = 8.0
 
 W = COLS * OPENING_W + (COLS + 1) * T
@@ -275,64 +273,65 @@ def svg_pattern_bit():
 
 
 def svg_scandi_leg():
-    """Splayed tapered square leg: elevation showing the continuous four-face
-    taper and top apron zone, plus a plan of the 1-1/4" top section."""
+    """Plate-mounted tapered square leg: elevation showing the continuous
+    four-face taper and square top shoulder for a hanger bolt, plus plan."""
     S = 34.0
     pad_l, pad_t = 92, 44
     LH = LEG_LENGTH * S
-    top_w, bot_w, rail_h = SQ_TOP * S, SQ_BOT * S, FRAME_H * S
+    top_w, bot_w = SQ_TOP * S, SQ_BOT * S
     inset = (top_w - bot_w) / 2
     x0, y0 = pad_l, pad_t
     plan_x, plan_y = pad_l + top_w + 185, pad_t + 30
-    ww, hh = plan_x + top_w + 140, y0 + LH + 62
+    ww, hh = plan_x + top_w + 145, y0 + LH + 62
 
     o = [f'<svg viewBox="0 0 {ww:.0f} {hh:.0f}" class="dwg" role="img" '
-         f'aria-label="Splayed tapered square leg, elevation and plan">']
-    # elevation: symmetric four-face taper from 1-1/4" down to 3/4"
+         f'aria-label="Plate-mounted tapered square leg, elevation and plan">']
+    # elevation: symmetric four-face taper from 1-3/8" down to 3/4"
     o.append(f'<path class="wp" d="M {x0} {y0} H {x0+top_w:.1f} '
              f'L {x0+top_w-inset:.1f} {y0+LH:.1f} '
              f'H {x0+inset:.1f} Z"/>')
-    o.append(f'<line class="tick" x1="{x0}" y1="{y0+rail_h:.1f}" '
-             f'x2="{x0+top_w:.1f}" y2="{y0+rail_h:.1f}" stroke-dasharray="4 3"/>')
-    o.append(f'<text class="edge" x="{x0-8}" y="{y0+rail_h/2+4:.1f}" text-anchor="end">'
-             f'APRON ZONE</text>')
-    o.append(f'<text class="note" x="{x0-8}" y="{y0+rail_h/2+17:.1f}" text-anchor="end">'
-             f'rails join here</text>')
-    o.append(f'<text class="edge front" x="{x0+top_w+10:.1f}" y="{y0+LH*0.58:.1f}">'
+    # hanger bolt stud centered at the square top shoulder
+    bx = x0 + top_w / 2
+    o.append(f'<line x1="{bx:.1f}" y1="{y0}" x2="{bx:.1f}" y2="{y0-18}" '
+             f'stroke="var(--accent)" stroke-width="3"/>')
+    o.append(f'<text class="edge" x="{x0-8}" y="{y0+10:.1f}" text-anchor="end">'
+             f'SQUARE TOP</text>')
+    o.append(f'<text class="note" x="{x0-8}" y="{y0+23:.1f}" text-anchor="end">'
+             f'plate sets {SQ_SPLAY:.0f}&deg; splay</text>')
+    o.append(f'<text class="edge front" x="{x0+top_w+10:.1f}" y="{y0+LH*0.56:.1f}">'
              f'4-FACE TAPER</text>')
-    o.append(f'<text class="note" x="{x0+top_w+10:.1f}" y="{y0+LH*0.58+14:.1f}">'
-             f'1/4" per face</text>')
+    o.append(f'<text class="note" x="{x0+top_w+10:.1f}" y="{y0+LH*0.56+14:.1f}">'
+             f'5/16" per face</text>')
 
     # dimensions
-    dy = y0 - 22
+    dy = y0 - 28
     o.append(f'<line class="dim" x1="{x0}" y1="{dy}" x2="{x0+top_w:.1f}" y2="{dy}"/>')
-    o.append(f'<text class="num" x="{x0+top_w/2:.1f}" y="{dy-6}" text-anchor="middle">'
+    o.append(f'<text class="num" x="{bx:.1f}" y="{dy-6}" text-anchor="middle">'
              f'{frac(SQ_TOP)}"</text>')
     fy = y0 + LH + 20
     o.append(f'<line class="dim" x1="{x0+inset:.1f}" y1="{fy}" x2="{x0+top_w-inset:.1f}" y2="{fy}"/>')
-    o.append(f'<text class="num" x="{x0+top_w/2:.1f}" y="{fy+17}" text-anchor="middle">'
+    o.append(f'<text class="num" x="{bx:.1f}" y="{fy+17}" text-anchor="middle">'
              f'{frac(SQ_BOT)}"</text>')
     lx = x0 - 66
     o.append(f'<line class="dim" x1="{lx}" y1="{y0}" x2="{lx}" y2="{y0+LH:.1f}"/>')
     o.append(f'<text class="num" x="{lx-6}" y="{y0+LH/2:.1f}" text-anchor="end">'
              f'{frac(LEG_LENGTH)}"</text>')
-    o.append(f'<line class="dim" x1="{lx+22}" y1="{y0}" x2="{lx+22}" y2="{y0+rail_h:.1f}"/>')
-    o.append(f'<text class="num" x="{lx+16}" y="{y0+rail_h/2+4:.1f}" text-anchor="end">'
-             f'{frac(FRAME_H)}"</text>')
 
-    # plan at the top of the leg, showing symmetric taper on all four faces
+    # plan at the top of the leg, showing symmetric taper and centered bolt
     o.append(f'<rect class="wp" x="{plan_x}" y="{plan_y}" '
              f'width="{top_w:.1f}" height="{top_w:.1f}"/>')
     o.append(f'<rect x="{plan_x+inset:.1f}" y="{plan_y+inset:.1f}" '
              f'width="{bot_w:.1f}" height="{bot_w:.1f}" fill="none" '
              f'stroke="var(--accent)" stroke-dasharray="3 2"/>')
+    o.append(f'<circle cx="{plan_x+top_w/2:.1f}" cy="{plan_y+top_w/2:.1f}" '
+             f'r="3.5" fill="var(--accent)"/>')
     o.append(f'<text class="lbl" x="{plan_x}" y="{plan_y-32}">PLAN (TOP &amp; FOOT)</text>')
     o.append(f'<text class="note" x="{plan_x}" y="{plan_y-14}">'
              f'outer: {frac(SQ_TOP)}" sq · dashed: {frac(SQ_BOT)}" foot</text>')
     o.append(f'<text class="note" x="{plan_x}" y="{plan_y+top_w+26:.1f}">'
-             f'all four faces tapered equally;</text>')
+             f'centred 5/16" hanger bolt;</text>')
     o.append(f'<text class="note" x="{plan_x}" y="{plan_y+top_w+42:.1f}">'
-             f'splayed {SQ_SPLAY:.0f}&deg; toward each corner</text>')
+             f'all four legs are identical</text>')
     o.append("</svg>")
     return "\n".join(o)
 
@@ -1111,36 +1110,34 @@ vertical lines.</p>""")
     LEGS_SECTION = "" if DOCS else f"""<section class="step" style="border-top-width:2px">
 <div class="num-badge" style="color:var(--accent);background:transparent;border:1px solid var(--accent)">ALT</div>
 <div class="step-body">
-<h2>Variant &mdash; recessed pine base frame</h2>
-<p>Instead of bought turned legs or steel legs, the pine version stands on a slim
-recessed apron frame ({frac(T)}&Prime; &times; {frac(FRAME_H)}&Prime; rails) inset
-{frac(FRAME_IN)}&Prime; from the carcass edges, with four splayed square legs
-tapering from {frac(SQ_TOP)}&Prime; to {frac(SQ_BOT)}&Prime; at {SQ_SPLAY:.0f}&deg;
-total splay. Keeping the apron slim and setting it back under the box preserves
-the light stance of the mid-century silhouette without exposed glue blocks.</p>
-{figure(spine, "The rack in pine on a recessed base frame with splayed tapered square legs.")}
+<h2>Variant &mdash; shop-made pine square legs</h2>
+<p>Instead of bought turned legs, you can make four slender tapered square pine
+legs ({frac(SQ_TOP)}&Prime; tapering to {frac(SQ_BOT)}&Prime;) and mount them
+with the <b>same 8&deg; angled steel plates and hanger bolts</b> as the walnut
+build. Using the plates keeps the underside completely open &mdash; no apron
+rails, no glue blocks, and no compound-angle top shoulder cuts.</p>
+{figure(spine, "The rack in pine with shop-made splayed tapered square legs on angled steel plates.")}
 
 <h3>Stock</h3>
-<p>Rip the four apron rails ({frac(FRAME_H)}&Prime; tall) from the same
-{frac(T)}&Prime; carcass board. Make the four legs from clear straight-grained
-stock milled to {frac(SQ_TOP)}&Prime; square (laminate two strips of
-{frac(T)}&Prime; stock and plane to {frac(SQ_TOP)}&Prime; if you don't have
-thicker stock on hand).</p>
+<p>Start with clear straight-grained pine milled to {frac(SQ_TOP)}&Prime; square
+(laminate two strips of {frac(T)}&Prime; board and plane to {frac(SQ_TOP)}&Prime;,
+or trim a straight nominal 2&times;2 slightly). Leave the top end cut dead square
+at 90&deg; &mdash; the mounting plate supplies the {SQ_SPLAY:.0f}&deg; splay.</p>
 
 <h3>Taper all four faces equally</h3>
-{figure(svg_scandi_leg(), "Continuous four-face taper from 1-1/4 in at the top to 3/4 in at the foot. Trimming both ends at the compound splay angle sits the top flat under the case and the foot flat on the floor.", raster=False)}
-<p>Mark 1/4&Prime; in from each edge at the foot and taper continuously from top
+{figure(svg_scandi_leg(), "Continuous four-face taper from 1-3/8 in at the square top shoulder to 3/4 in at the foot, with a centred 5/16 in hanger bolt.", raster=False)}
+<p>Mark 5/16&Prime; in from each edge at the foot and taper continuously from top
 to bottom on all four faces with a track saw tapering sled or a hand plane.
 Ease every long arris lightly afterwards &mdash; pine dents easily and crisp
 corners chip when the rack is moved.</p>
 
-<h3>Assembling the base frame</h3>
-{figure(sbase, "Slim 1-1/4 in apron rails set 3/4 in back from the carcass edges, recessed 1/8 in behind the outer faces of the splayed legs.")}
-<p>Join the four apron rails to the splayed legs (dowels or pocket/angled screws
-from inside the rails) so the outer faces of the legs sit 1/8&Prime; proud of
-the apron. Trim the top shoulders and feet flat and parallel to the floor plane,
-then screw the finished base frame up into the underside of the bottom rail as
-one unit.</p>
+<h3>Mounting on the angled plates</h3>
+{figure(sbase, "The same 8-degree angled steel mounting plates used on the walnut build, with nothing between the legs.")}
+<p>Bore a centred pilot hole straight into the square top of each leg and drive
+in a 5/16&Prime; hanger bolt. Screw the four plates to the underside of the
+bottom rail (reinforced inside the bottom cells with the same hidden cleats from
+step 12), spin the legs on, and trim the feet <b>flat and parallel to the
+floor</b> so all four sit without rocking.</p>
 </div></section>"""
 
     # Has to follow the piece: this is the browser tab, and it is the name the

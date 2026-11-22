@@ -25,7 +25,7 @@ module leg_plate(sx, sy) {
     } else if (PLATED) {
         translate([px, py, -PLATE_T]) cube([MOUNT_XY, MOUNT_XY, PLATE_T]);
         intersection() {
-            at_leg(sx, sy) cylinder(h = 3, d = LEG_TOP_D_EFF);
+            at_leg(sx, sy) cylinder(h = 3, d = SQUARE ? 1.20 : LEG_TOP_D_EFF);
             translate([-60, -60, -60 - PLATE_T]) cube([120, 120, 60]);
         }
     } else {

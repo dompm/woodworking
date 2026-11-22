@@ -35,13 +35,13 @@ openscad -D show_bottles=false lib/casework.scad
 
 ## Base options from one model
 
-| | Turned wood (walnut / cherry) | Recessed wood frame (pine) | Bought steel (ash) |
+| | Turned wood (walnut / cherry) | Square wood (pine) | Bought steel (ash) |
 |---|---|---|---|
 | `LEG_STYLE` | `round` | `square` | `metal` |
 | `DEPTH` | 9 | **9.25** — 1×10 S4S actual width | 9 |
-| Legs | bought, splayed 8&deg;, brass ferrules, angled steel plates | **made**: 1-1/4 sq tapering to 3/4 on all four faces, splayed 8&deg; | bought black steel, 1-1/16 to 9/16 taper, splayed 8&deg;, rubber caps |
-| Leg fixing | angled steel plate + hangar bolt | slim 3/4 × 1-1/4 recessed apron frame inset 3/4" | flat 4-hole welded mounting plate |
-| Overall height | 39-1/2 | 39-1/8 | 39-1/4 |
+| Legs | bought, splayed 8&deg;, brass ferrules, angled steel plates | **made**: 1-3/8 sq tapering to 3/4 on all four faces, splayed 8&deg; | bought black steel, 1-1/16 to 9/16 taper, splayed 8&deg;, rubber caps |
+| Leg fixing | angled steel plate + hangar bolt | angled steel plate + hangar bolt (same plates, open underside) | flat 4-hole welded mounting plate |
+| Overall height | 39-1/2 | 39-1/2 | 39-1/4 |
 | Lap slot depth | 4-1/2 | 4-5/8 | 4-1/2 |
 | Everything else | *identical* | *identical* | *identical* |
 
@@ -52,9 +52,9 @@ openscad -D 'LEG_STYLE="metal"' lib/casework.scad
 
 Part lengths and all seven housing positions stay the same across all three
 options, because every carcass part uses the full board width and only the lap
-depth follows `DEPTH`. The pine variant replaces corner glue blocks with a slim
-recessed apron frame and slender splayed tapered legs so the shop-made wood base
-holds the same visual weight as the turned and steel versions.
+depth follows `DEPTH`. Mounting the shop-made square pine legs on the same 8°
+angled steel plates keeps the underside completely open and avoids compound-angle
+top shoulder cuts.
 
 ## Views
 
@@ -72,7 +72,7 @@ holds the same visual weight as the turned and steel versions.
 | `motion.png` | top rail dropping onto the two stile ledges |
 | `stile.png` | one stile alone, five dadoes and two end rabbets |
 | `base.png` | leg plates and ferrules |
-| `scandi_base.png` | the pine variant's recessed base frame and splayed legs |
+| `scandi_base.png` | the pine variant's plate-mounted splayed square legs |
 
 ## Parameters worth changing
 

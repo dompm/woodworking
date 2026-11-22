@@ -33,9 +33,9 @@ ex brass brass 0
 ex steel steel 0
 ex bottles bottles 0
 
-# The pine variant uses splayed tapered square legs on a slim recessed base
-# frame (no glue blocks, no brass or steel hardware).
-echo "exporting pine frame parts"
+# The pine variant uses shop-made tapered square legs mounted on the same 8-deg
+# angled steel plates as the turned legs (no apron rails, no glue blocks).
+echo "exporting pine square-leg parts"
 mkdir -p "$EXP/parts_scandi"
 rm -f "$EXP/parts_scandi"/*.stl
 sx() {
@@ -47,8 +47,7 @@ for i in 0 1; do sx "stile$i" stile $i; done
 for i in 0 1 2 3 4 5 6; do sx "horiz$i" horiz $i; done
 sx divider divider 0
 for i in 0 1 2 3; do sx "leg$i" leg $i; done
-sx frame_x frame_x 0
-sx frame_y frame_y 0
+sx steel steel 0
 sx bottles bottles 0
 
 # The metal-leg variant uses bought splayed tapered steel legs welded to flat

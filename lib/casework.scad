@@ -102,34 +102,34 @@ LEG_MOUNT   = "plate";
 
 // ---------------- leg style ----------------
 //  "round"   turned, splayed, brass ferrules -- the mid-century look. Bought.
-//  "square"  made from shop stock: slender splayed square legs tapering on all
-//            four faces, joined to a slim recessed apron frame under the case.
+//  "square"  shop-made square legs tapering symmetrically on all four faces,
+//            mounted on the same 8-degree angled steel plates + hanger bolts
+//            as the turned legs (no apron rails or exposed glue blocks).
 //  "metal"   bought black steel, splayed on flat 4-hole welded mounting plates
 //            with rounded black rubber foot caps.  Steel carries the load in a
 //            diameter wood cannot, so the base reads light and crisp.
 LEG_STYLE = "round";
 
-SQ_TOP   = 1.25;    // square leg, across the flats at the top
+SQ_TOP   = 1.375;   // square leg, across the flats at the top
 SQ_BOT   = 0.75;    // at the foot
-SQ_INSET = 0.125;   // reveal when SQ_FRAME = false
-// Top section stays full square through the frame depth before tapering cleanly.
+SQ_INSET = 0.125;   // reveal when SQ_FRAME = false and LEG_MOUNT = "block"
+// Top section stays full square when using legacy glue blocks.
 SQ_STRAIGHT = 1.25;
 // Total lean off plumb for the SQUARE leg, degrees.  Matches the 8-degree
-// mid-century splay of the turned and metal legs; set 0 for a plumb stance.
+// angled plate; set 0 with LEG_MOUNT="block" for a plumb glue-block stance.
 SQ_SPLAY = 8;
 
-// Put the square legs on their own recessed BASE FRAME instead of glue blocks.
-// Legs joined to apron rails form one clean, square sub-assembly on the bench
-// that screws under the carcass, leaving a crisp shadow reveal all around.
-SQ_FRAME     = true;
+// Optional recessed wooden base frame for wide/low casework (off for the wine
+// rack, where plate-mounted splayed legs keep the base visually light).
+SQ_FRAME     = false;
 FRAME_IN     = 0.75;   // frame set in from the case edges -- the shadow gap
 FRAME_H      = 1.25;   // slim rail depth, proportional to 3/4" carcass stock
 FRAME_T      = 0.75;   // rail thickness (ripped from the same 3/4" board)
 FRAME_REVEAL = 0.125;  // subtle step setting the rails back from the leg faces
-GB_XY    = 1.00;    // glue blocks when SQ_FRAME = false
+GB_XY    = 1.00;    // glue blocks when SQ_FRAME = false and LEG_MOUNT = "block"
 GB_H     = 1.25;
 
-PLATE_XY       = 2.375;  // angled steel plate footprint (turned wood legs)
+PLATE_XY       = 2.375;  // angled steel plate footprint (wood legs)
 PLATE_T        = 0.125;  // plate thickness
 PLATE_BOSS     = 0.20;   // mean thickness of the angled seat on top of the plate
 METAL_PLATE_XY = 2.625;  // flat 4-hole welded mounting plate (bought steel legs)
@@ -153,14 +153,16 @@ METAL    = (LEG_STYLE == "metal");
 // the shoulder, which is why the turned version has to be 1-1/2" at the top.
 LEG_TOP_D_EFF = METAL ? 1.05 : LEG_TOP_D;
 LEG_BOT_D_EFF = METAL ? 0.55 : LEG_BOT_D;
-PLATED   = (LEG_MOUNT == "plate") && !SQUARE;
-MOUNT_XY = METAL ? METAL_PLATE_XY : (PLATED ? PLATE_XY : BLOCK_XY);
-MOUNT_IN = METAL ? 0.50 : MOUNT_INSET;
-// a square leg butts straight up against the underside; a welded metal leg
-// meets a flat plate with no angled boss in between
-MOUNT_H  = SQUARE ? 0 : (METAL ? PLATE_T : (PLATED ? PLATE_T + PLATE_BOSS : BLOCK_H));
+SQ_PLATED = SQUARE && !SQ_FRAME && (LEG_MOUNT == "plate");
+PLATED    = (LEG_MOUNT == "plate") && (!SQUARE || SQ_PLATED);
+MOUNT_XY  = METAL ? METAL_PLATE_XY : (PLATED ? PLATE_XY : BLOCK_XY);
+MOUNT_IN  = METAL ? 0.50 : MOUNT_INSET;
+// Framed/glue-block square legs butt directly under the case; plate-mounted
+// wood legs sit on the angled plate seat; welded steel legs meet a flat plate.
+MOUNT_H   = (SQUARE && !SQ_PLATED) ? 0
+          : (METAL ? PLATE_T : (PLATED ? PLATE_T + PLATE_BOSS : BLOCK_H));
 
-LEG_TILT_EFF = SQUARE ? SQ_SPLAY : LEG_TILT_SPEC;
+LEG_TILT_EFF = (SQUARE && !SQ_PLATED) ? SQ_SPLAY : LEG_TILT_SPEC;
 
 // Per-axis splay that adds up to LEG_TILT_EFF of total lean:
 // cos(splay) * cos(splay) == cos(tilt).
@@ -495,14 +497,32 @@ module sq_leg_shape(sx, sy, grow = 0) {
     }
 }
 
-module leg_square(sx, sy) {
-    // A splayed leg cut square to its own axis stands on an edge and rocks, so
-    // the foot is trimmed to the floor plane instead -- same trick the brass
-    // ferrule does on the turned leg.
+// Plate-mounted square tapered leg: centered on the angled steel plate so the
+// plate carries the 8-degree splay and the top is a plain 90-degree crosscut.
+module leg_square_plated(sx, sy) {
     color(WALNUT) difference() {
-        at_sq(sx, sy) sq_leg_shape(sx, sy);
+        at_leg(sx, sy) hull() {
+            translate([-SQ_TOP/2, -SQ_TOP/2, -0.02])
+                cube([SQ_TOP, SQ_TOP, 0.02]);
+            translate([-SQ_BOT/2, -SQ_BOT/2, -LEG_AXIS_L - SQ_OVER])
+                cube([SQ_BOT, SQ_BOT, 0.02]);
+        }
         below_floor();
-        translate([-60, -60, 0.02]) cube([120, 120, 60]);   // flat to the case
+    }
+}
+
+module leg_square(sx, sy) {
+    if (SQ_PLATED) {
+        leg_square_plated(sx, sy);
+    } else {
+        // A splayed leg cut square to its own axis stands on an edge and rocks, so
+        // the foot is trimmed to the floor plane instead -- same trick the brass
+        // ferrule does on the turned leg.
+        color(WALNUT) difference() {
+            at_sq(sx, sy) sq_leg_shape(sx, sy);
+            below_floor();
+            translate([-60, -60, 0.02]) cube([120, 120, 60]);   // flat to the case
+        }
     }
 }
 
@@ -569,7 +589,7 @@ module leg_blocks_fitted(sx, sy) {
 }
 
 module base(explode = 0) {
-    if (SQUARE) {
+    if (SQUARE && !SQ_PLATED) {
         for (sx = [-1, 1], sy = [-1, 1]) {
             if (!SQ_FRAME)
                 translate([0, 0, -explode * 0.5]) leg_blocks_fitted(sx, sy);
@@ -595,7 +615,7 @@ module base_round(explode = 0) {
                     // the angled seat: a wedge whose underside is square to
                     // the leg and whose top is flat against the plate
                     intersection() {
-                        at_leg(sx, sy) cylinder(h = 3, d = LEG_TOP_D_EFF);
+                        at_leg(sx, sy) cylinder(h = 3, d = SQUARE ? 1.20 : LEG_TOP_D_EFF);
                         translate([-60, -60, -60 - PLATE_T]) cube([120, 120, 60]);
                     }
                 }
@@ -612,6 +632,7 @@ module base_round(explode = 0) {
 
         translate([0, 0, -explode * 2.2]) {
             if (METAL) leg_metal(sx, sy);
+            else if (SQUARE) leg_square(sx, sy);
             else { leg_wood(sx, sy); leg_ferrule(sx, sy); }
         }
     }
@@ -744,9 +765,10 @@ echo(EGG
 if (show_legs) {
     echo(str("leg style           = ", LEG_STYLE,
              SQUARE ? str("  (made: square, ",
-                          SQ_SPLAY == 0 ? "tapered inner faces, plumb)"
-                                        : str(SQ_FRAME ? "recessed frame, " : "",
-                                              "tapered four faces, ", SQ_SPLAY, " deg splay)"))
+                          SQ_PLATED ? str("plate mount, tapered four faces, ", LEG_TILT_EFF, " deg splay)")
+                                    : (SQ_SPLAY == 0 ? "tapered inner faces, plumb)"
+                                                     : str(SQ_FRAME ? "recessed frame, " : "",
+                                                           "tapered four faces, ", SQ_SPLAY, " deg splay)")))
                     : str("  (bought: ", METAL ? "flat plate" : LEG_MOUNT, " mount, ",
                           LEG_TILT_SPEC, " deg splay)")));
     echo(str("leg length          = ", LEG_LENGTH));

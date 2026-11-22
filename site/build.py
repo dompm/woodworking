@@ -98,7 +98,7 @@ def project_page(project):
     body+=f'<a href="{href(model_bundle(project),folder)}" download>Model sources (.zip) <span aria-hidden="true">↓</span></a></nav>'
     body+='<section class="views"><h2>Views</h2><div class="view-grid">'
     views={view['file']:view for view in project['views']}
-    labels={'hero':'Assembly view','persp':'Perspective view','front':'Front elevation','side':'Side elevation','top':'Top view','exploded':'Exploded assembly','joint':'Joint detail','corner_top':'Upper corner','side_bottles':'Side view with bottles','lap':'Half-lap joint','eggcrate':'Shelf and divider assembly','motion':'Assembly sequence','stile':'Side panel','scandi_base':'Recessed wood base','waterfall':'Panel layout'}
+    labels={'hero':'Assembly view','persp':'Perspective view','front':'Front elevation','side':'Side elevation','top':'Top view','exploded':'Exploded assembly','joint':'Joint detail','corner_top':'Upper corner','side_bottles':'Side view with bottles','lap':'Half-lap joint','eggcrate':'Shelf and divider assembly','motion':'Assembly sequence','stile':'Side panel','scandi_base':'Square-leg base detail','waterfall':'Panel layout'}
     stages={'01':'Parts before assembly','02':'Wall frame','03':'Applied bottom','04':'Dividers and pencil riser','05':'Sliding lid fit'}
     source_folder=ROOT/'projects'/project['slug']
     for subfolder in ('renders','photos'):
