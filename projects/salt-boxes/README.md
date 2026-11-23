@@ -4,7 +4,7 @@ A pair. **3-1/4" square**, differing only in height. Stack-laminated from
 hardwood offcuts, with generously rounded corners and a lid that pivots on a
 brass screw.
 
-![Open](renders/L2_open.png)
+![Salt boxes](renders/beauty_walnut.png)
 
 | | MSG | Sugar |
 |---|---|---|

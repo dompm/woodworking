@@ -12,4 +12,3 @@ for project,source in (('bedside-table','BUILD.md'),('salt-boxes','README.md')):
     folder=ROOT/'projects'/project
     print(write_guide(folder/source,folder/'guide.html',navigation=[
         ('Project','README.md'),('Editable guide',source)]))
-subprocess.run([sys.executable,str(ROOT/'projects/travel-yahtzee/build_guides.py')],check=True)
