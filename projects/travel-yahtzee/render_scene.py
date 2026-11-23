@@ -67,7 +67,9 @@ def render(label,view,hardwood=False):
     W,L,H=[v*.0254 for v in manifest['dimensions'][:3]]
     wood={a:timber(a) for a in 'XYZ'};hard={a:timber(a,False) for a in 'XYZ'}
     mats={'paper':simple('warm paper',(.87,.85,.77)),'ivory':simple('ivory dice',(.83,.77,.61)),
-          'ink':simple('graphite',(.017,.023,.022)),'pencil':simple('brushed silver',(.5,.54,.57),.85),'rail':hard['Y']}
+          'ink':simple('graphite',(.017,.023,.022)),'pencil':simple('brushed silver',(.5,.54,.57),.85),
+          'pin':simple('steel pin',(.66,.68,.71),.95),'rail':hard['Y']}
+    mats['pin'].node_tree.nodes.get('Principled BSDF').inputs['Roughness'].default_value=.22
     objects={}
     for part in manifest['parts']:
         name=part['name']
@@ -79,6 +81,11 @@ def render(label,view,hardwood=False):
             bevel=obj.modifiers.new('lightly eased edges','BEVEL');bevel.width=.00016;bevel.segments=2
             obj.modifiers.new('face normals','WEIGHTED_NORMAL')
         if name=='lid' and view=='open':obj.location=(W+.022,0,-part['position'][2]*.0254)
+        if name=='lock_pin':
+            bevel=obj.modifiers.new('pin edge','BEVEL');bevel.width=.00022;bevel.segments=2
+            if view=='open':
+                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+                obj.location=(W+.022+W*.5,-.014,.0028);obj.rotation_euler=(0,math.pi/2,.25)
         objects[name]=obj
     ink=mats['ink'];pad=next(p for p in manifest['parts'] if p['name']=='scorepad')
     px,py,pz=[v*.0254 for v in pad['position']];pw,pl,ph=[v*.0254 for v in pad['size']];z=pz+ph+.00006
@@ -115,7 +122,7 @@ def render(label,view,hardwood=False):
         target=Vector((W/2,L*.42,H*.8));cam.location=target+Vector((.25,-.38,.43));camdata.type='ORTHO';camdata.ortho_scale=.39
     elif view=='top':
         target=Vector((W/2,L/2,0));cam.location=target+Vector((0,0,.6));camdata.type='ORTHO';camdata.ortho_scale=.29
-        objects['lid'].hide_render=True
+        objects['lid'].hide_render=True;objects['lock_pin'].hide_render=True
     elif view=='detail':
         target=Vector((W*.20,L*.90,H*.55));cam.location=target+Vector((-.14,.16,.12));camdata.type='ORTHO';camdata.ortho_scale=.105
     else:

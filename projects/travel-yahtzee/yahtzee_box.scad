@@ -51,6 +51,12 @@ LID_L = L-T-SLIDE_CLEAR;
 END_X = joinery == "butt" ? T : 0;
 END_W = W-2*END_X;
 PIP_R = 1.1/25.4;
+PIN_D = 3/25.4;
+PIN_HEAD_D = 5.5/25.4;
+PIN_HEAD_H = 3/25.4;
+PIN_DEPTH = 10/25.4;
+PIN_MAG_H = 2/25.4;
+PIN_HOLE_R = PIN_D/2 + 0.1/25.4;
 $fn=32;
 
 assert(joinery=="finger" || joinery=="butt");
@@ -90,7 +96,8 @@ content_parts = concat([
  ["scorepad",[MARGIN+PAPER_CLEAR/2,PAPER_Y,BASE],[PAPER_W,PAPER_L,PAPER_H],"paper","Z"],
  ["pencil",[MARGIN+(PAD_W-PENCIL_L)/2,PENCIL_Y+PENCIL_BAY/2,BASE+2*T+PENCIL_D/2],[PENCIL_L,PENCIL_D,PENCIL_D],"pencil","X"]
 ], [for(i=[0:4]) [str("die",i+1),[dice_x(i),DICE_Y+(DICE_BAY-DIE)/2,BASE],[DIE,DIE,DIE],"ivory","Z"]],
- [for(i=[0:4]) [str("pips",i+1),[dice_x(i),DICE_Y+(DICE_BAY-DIE)/2,BASE],[DIE,DIE,DIE],"ink","Z"]]);
+ [for(i=[0:4]) [str("pips",i+1),[dice_x(i),DICE_Y+(DICE_BAY-DIE)/2,BASE],[DIE,DIE,DIE],"ink","Z"]],
+ [["lock_pin",[W/2-PIN_HEAD_D/2,T/2-PIN_HEAD_D/2,BASE+FRONT_H-PIN_DEPTH],[PIN_HEAD_D,PIN_HEAD_D,PIN_DEPTH+SLIDE_CLEAR+LID+PIN_HEAD_H],"pin","Z"]]);
 parts = concat(wood_parts,rail_parts,content_parts);
 
 module block(size) { cube(size); }
@@ -119,6 +126,8 @@ module end_wall(back=false) {
  difference() {
   translate([END_X,yy,BASE]) cube([END_W,T,hh]);
   if(joinery=="finger") for(xx=[0,W-T]) corner_removals(false,hh,xx,yy);
+  if(!back) translate([W/2,T/2,BASE+FRONT_H-PIN_DEPTH-PIN_MAG_H])
+   cylinder(r=PIN_HOLE_R,h=PIN_DEPTH+PIN_MAG_H+EPS,$fn=24);
  }
 }
 module divider(y, scoop=false) {
@@ -132,9 +141,17 @@ module divider(y, scoop=false) {
 module lid() {
  difference() {
   translate([LID_X,0,LID_Z]) cube([LID_W,LID_L,LID]);
+  translate([W/2,T/2,LID_Z-EPS]) cylinder(r=PIN_HOLE_R,h=LID+2*EPS,$fn=24);
   // A small plan chamfer clears the rounded end left by a narrow groove bit.
   for(xx=[LID_X,LID_X+LID_W]) translate([xx,LID_L,LID_Z-EPS])
    linear_extrude(LID+2*EPS) polygon(xx<W/2?[[0,0],[0,-0.08],[0.08,0]]:[[0,0],[0,-0.08],[-0.08,0]]);
+ }
+}
+module lock_pin() {
+ translate([W/2,T/2,BASE+FRONT_H-PIN_DEPTH]) {
+  cylinder(d=PIN_D,h=PIN_DEPTH+SLIDE_CLEAR+LID,$fn=24);
+  translate([0,0,PIN_DEPTH+SLIDE_CLEAR+LID])
+   cylinder(d=PIN_HEAD_D,h=PIN_HEAD_H,$fn=24);
  }
 }
 function pip_pattern(n)=n==1?[[.5,.5]]:n==2?[[.27,.27],[.73,.73]]:n==3?[[.27,.27],[.5,.5],[.73,.73]]:n==4?[[.27,.27],[.73,.27],[.27,.73],[.73,.73]]:[[.27,.27],[.73,.27],[.5,.5],[.27,.73],[.73,.73]];
@@ -172,6 +189,7 @@ module part(i) {
  else if(n=="pencil_divider") divider(DIV2_Y,true);
  else if(n=="lid") lid();
  else if(n=="pencil") pencil();
+ else if(n=="lock_pin") lock_pin();
  else if(i>=len(wood_parts)+len(rail_parts)+2 && i<len(wood_parts)+len(rail_parts)+7) die(i-len(wood_parts)-len(rail_parts)-1);
  else if(i>=len(wood_parts)+len(rail_parts)+7) die(i-len(wood_parts)-len(rail_parts)-6,true);
  else translate(parts[i][1]) block(parts[i][2]);

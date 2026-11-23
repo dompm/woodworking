@@ -136,12 +136,11 @@ Ease the lid's back corners to clear the round-ended stopped grooves.
 Fit the lid gradually, soften exposed edges lightly, and finish. Do not
 round away finger-joint faces or the thin groove backing. Keep heavy finish
 buildup out of the tracks; use a finished scrap to establish running fit.
-Choose and test a positive travel closure before using it in luggage.
-The current model uses a plain lid with a rear stop and no latch or pin hole
-modeled; a small vertical drop pin (2–2.5 mm steel pin drilled through the
-closed lid into the ¼-inch front wall, with a 3 mm × 2 mm magnet at the bottom
-of the hole) keeps the pin head recessed below the ¼-inch side rim. Friction
-alone is not a validated travel catch.
+For travel retention, drill a 3 mm vertical pin hole through the closed lid
+and 12 mm into the center of the ¼-inch front wall, glue a 3 mm × 2 mm
+neodymium magnet at the bottom of the blind hole, and fit a headed 3 mm steel
+drop pin. The pin blocks the lid in shear while the magnet holds it seated
+upside-down, and its low head stays recessed below the ¼-inch side rim.
 
 ![Completed box with the mini pencil, five dice and scorepad](renders/butt_top.png)
 
