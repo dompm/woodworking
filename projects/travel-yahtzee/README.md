@@ -137,8 +137,11 @@ Fit the lid gradually, soften exposed edges lightly, and finish. Do not
 round away finger-joint faces or the thin groove backing. Keep heavy finish
 buildup out of the tracks; use a finished scrap to establish running fit.
 Choose and test a positive travel closure before using it in luggage.
-The current model has a finger notch and a rear stop, but no latch or
-magnet pockets. Friction alone is not a validated travel catch.
+The current model uses a plain lid with a rear stop and no latch or pin hole
+modeled; a small vertical drop pin (2–2.5 mm steel pin drilled through the
+closed lid into the ¼-inch front wall, with a 3 mm × 2 mm magnet at the bottom
+of the hole) keeps the pin head recessed below the ¼-inch side rim. Friction
+alone is not a validated travel catch.
 
 ![Completed box with the mini pencil, five dice and scorepad](renders/butt_top.png)
 

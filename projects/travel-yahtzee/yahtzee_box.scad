@@ -132,7 +132,6 @@ module divider(y, scoop=false) {
 module lid() {
  difference() {
   translate([LID_X,0,LID_Z]) cube([LID_W,LID_L,LID]);
-  translate([W/2,0,LID_Z-EPS]) cylinder(r=0.32,h=LID+2*EPS);
   // A small plan chamfer clears the rounded end left by a narrow groove bit.
   for(xx=[LID_X,LID_X+LID_W]) translate([xx,LID_L,LID_Z-EPS])
    linear_extrude(LID+2*EPS) polygon(xx<W/2?[[0,0],[0,-0.08],[0.08,0]]:[[0,0],[0,-0.08],[-0.08,0]]);
